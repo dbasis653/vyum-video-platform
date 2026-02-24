@@ -32,14 +32,14 @@ export async function POST(request: NextRequest) {
     }
 
     //array-buffer take the file 'file' and convert it to low-lvl code
-    //not as .png, .mp3... it consider just a file
+    //not as .png, .mp3... it consider just file just as a file
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     const result = await new Promise<CloudinaryUploadResult>(
       (resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
-          { folder: "vyum-images" },
+          { folder: "images" },
           (error, result) => {
             if (error) reject(error);
             else resolve(result as CloudinaryUploadResult);
