@@ -9,7 +9,13 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(videos);
+    const dto = videos.map((video) => ({
+      ...video,
+      originalSize: Number(video.originalSize),
+      compressedSize: Number(video.compressedSize),
+    }));
+
+    return NextResponse.json(dto);
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch videos" },

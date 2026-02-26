@@ -11,12 +11,14 @@ function VideoUpload() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(0);
 
   const router = useRouter();
 
   const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
-  const handleSubmit = async (event: React.SubmitEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!file) return;
@@ -26,6 +28,7 @@ function VideoUpload() {
     }
 
     setIsUploading(true);
+    setUploadSuccess(false);
     const formData = new FormData();
     //It creates an empty formData() container
 
@@ -40,6 +43,11 @@ function VideoUpload() {
       const response = await axios.post("/api/video-upload", formData);
 
       //check for 200 reponse
+      setTitle("");
+      setDescription("");
+      setFile(null);
+      setFileInputKey((prev) => prev + 1);
+      setUploadSuccess(true);
     } catch (error) {
       console.log(
         "failled trying to upload the video using post method",
@@ -61,7 +69,10 @@ function VideoUpload() {
           <input
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setUploadSuccess(false);
+            }}
             className="input input-bordered w-full"
             required
           />
@@ -72,7 +83,10 @@ function VideoUpload() {
           </label>
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setUploadSuccess(false);
+            }}
             className="textarea textarea-bordered w-full"
           />
         </div>
@@ -81,9 +95,13 @@ function VideoUpload() {
             <span className="label-text">Video File</span>
           </label>
           <input
+            key={fileInputKey}
             type="file"
             accept="video/*"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            onChange={(e) => {
+              setFile(e.target.files?.[0] || null);
+              setUploadSuccess(false);
+            }}
             className="file-input file-input-bordered w-full"
             required
           />
@@ -93,9 +111,21 @@ function VideoUpload() {
           className="btn btn-primary"
           disabled={isUploading}
         >
-          {isUploading ? "Uploading..." : "Upload Video"}
+          {isUploading ? (
+            <>
+              <span className="loading loading-spinner loading-sm"></span>
+              Uploading...
+            </>
+          ) : (
+            "Upload Video"
+          )}
         </button>
       </form>
+      {uploadSuccess && (
+        <div className="mt-4 p-4 rounded-lg bg-green-100 text-green-800 text-sm">
+          Your video has been added to your own little cloud
+        </div>
+      )}
     </div>
   );
 }

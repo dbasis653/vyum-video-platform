@@ -9,7 +9,7 @@ const isPublicRoute = createRouteMatcher([
   "/home",
 ]);
 
-const isPublicApiRoute = createRouteMatcher(["/api/videos"]);
+const isPublicApiRoute = createRouteMatcher(["/api/videos", "/api/images"]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
