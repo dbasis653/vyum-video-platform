@@ -1,5 +1,5 @@
+import Image from "next/image";
 import HeroSection from "@/components/landing/HeroSection";
-import PlaceholderGrid from "@/components/landing/PlaceholderGrid";
 
 export default function LandingPage() {
   return (

@@ -17,6 +17,7 @@ interface ImageCardProps {
 }
 
 const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
+  const previewDialogRef = useRef<HTMLDialogElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [editTitle, setEditTitle] = useState(image.title);
   const [isSaving, setIsSaving] = useState(false);
@@ -33,6 +34,10 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
     });
   }, []);
 
+  const getFullImageUrl = useCallback((publicId: string) => {
+    return getCldImageUrl({ src: publicId });
+  }, []);
+
   const openModal = () => {
     setEditTitle(image.title);
     setModalError(null);
@@ -42,7 +47,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
   const closeModal = () => dialogRef.current?.close();
 
   const handleDownload = () => {
-    const url = getCldImageUrl({ src: image.publicId });
+    const url = getFullImageUrl(image.publicId);
     fetch(url)
       .then((res) => res.blob())
       .then((blob) => {
@@ -95,7 +100,15 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
 
   return (
     <>
-      <div className="card bg-base-100 shadow-md hover:shadow-lg transition-all duration-300 w-full">
+      {/* Card */}
+      <div
+        className="card bg-base-100 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer w-full"
+        tabIndex={0}
+        onClick={() => previewDialogRef.current?.showModal()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") previewDialogRef.current?.showModal();
+        }}
+      >
         <figure className="aspect-video">
           <img
             src={getThumbnailUrl(image.publicId)}
@@ -114,15 +127,15 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
           <div className="flex justify-end gap-1 mt-1">
             <button
               className="btn btn-ghost btn-xs"
-              onClick={openModal}
               title="Edit image"
+              onClick={(e) => { e.stopPropagation(); openModal(); }}
             >
               <SquarePen size={13} />
             </button>
             <button
               className="btn btn-primary btn-xs"
-              onClick={handleDownload}
               title="Download image"
+              onClick={(e) => { e.stopPropagation(); handleDownload(); }}
             >
               <Download size={13} />
             </button>
@@ -130,10 +143,48 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
         </div>
       </div>
 
+      {/* Preview modal */}
+      <dialog ref={previewDialogRef} className="modal">
+        <div className="modal-box max-w-2xl">
+          <img
+            src={getFullImageUrl(image.publicId)}
+            alt={image.title}
+            className="w-auto mx-auto block rounded-lg object-contain max-h-[60vh] max-w-full"
+          />
+          <div className="flex justify-between items-center mt-4">
+            <h3 className="font-bold text-lg">{image.title}</h3>
+            <div className="flex gap-2">
+              <button
+                className="btn btn-ghost btn-sm"
+                title="Edit"
+                onClick={() => { previewDialogRef.current?.close(); openModal(); }}
+              >
+                <SquarePen size={16} />
+              </button>
+              <button
+                className="btn btn-primary btn-sm"
+                title="Download"
+                onClick={handleDownload}
+              >
+                <Download size={16} />
+              </button>
+            </div>
+          </div>
+          <div className="modal-action mt-2">
+            <form method="dialog">
+              <button className="btn btn-ghost btn-sm">Cancel</button>
+            </form>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+
+      {/* Edit modal */}
       <dialog ref={dialogRef} className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg mb-4">Edit Image</h3>
-
           <div className="form-control mb-4">
             <label className="label">
               <span className="label-text font-semibold">
@@ -148,17 +199,9 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
               disabled={busy}
             />
           </div>
-
-          {modalError && (
-            <p className="text-error text-sm mb-3">{modalError}</p>
-          )}
-
+          {modalError && <p className="text-error text-sm mb-3">{modalError}</p>}
           <div className="modal-action flex-wrap gap-2">
-            <button
-              className="btn btn-error btn-sm"
-              onClick={handleDelete}
-              disabled={busy}
-            >
+            <button className="btn btn-error btn-sm" onClick={handleDelete} disabled={busy}>
               {isDeleting && <span className="loading loading-spinner loading-xs" />}
               Delete
             </button>
@@ -166,11 +209,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
             <button className="btn btn-ghost btn-sm" onClick={closeModal} disabled={busy}>
               Cancel
             </button>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={handleSave}
-              disabled={busy}
-            >
+            <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={busy}>
               {isSaving && <span className="loading loading-spinner loading-xs" />}
               Save
             </button>

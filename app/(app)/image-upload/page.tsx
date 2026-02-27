@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { CldImage } from "next-cloudinary";
 
 const socialFormats = {
@@ -16,26 +16,33 @@ type SocialFormat = keyof typeof socialFormats;
 export default function ImageUpload() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [title, setTitle] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFormat, setSelectedFormat] = useState<SocialFormat>(
-    "Instagram Square (1:1)"
+    "Instagram Square (1:1)",
   );
   const [isUploading, setIsUploading] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    if (uploadedImage) {
-      setIsTransforming(true);
-    }
+    if (uploadedImage) setIsTransforming(true);
   }, [uploadedImage, selectedFormat]);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    setSelectedFile(file);
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) {
+      alert("Please select an image file first.");
+      return;
+    }
+
     setIsUploading(true);
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", selectedFile);
     formData.append("title", title.trim() || "Untitled");
 
     try {
@@ -46,7 +53,7 @@ export default function ImageUpload() {
 
       if (!response.ok) throw new Error("Upload image failed");
 
-      const data = await response.json();
+      const data: { publicId: string } = await response.json();
       setUploadedImage(data.publicId);
     } catch (error) {
       console.log("upload failed", error);
@@ -83,7 +90,9 @@ export default function ImageUpload() {
 
           <div className="form-control mb-3">
             <label className="label">
-              <span className="label-text">Title <span className="text-error">*</span></span>
+              <span className="label-text">
+                Title <span className="text-error">*</span>
+              </span>
             </label>
             <input
               type="text"
@@ -100,9 +109,33 @@ export default function ImageUpload() {
             </label>
             <input
               type="file"
-              onChange={handleFileUpload}
+              onChange={handleFileChange}
+              disabled={isUploading}
               className="file-input file-input-bordered file-input-primary w-full"
             />
+            {selectedFile && (
+              <p className="mt-2 text-sm text-base-content opacity-70">
+                Selected: {selectedFile.name}
+              </p>
+            )}
+          </div>
+
+          <div className="mt-4">
+            <button
+              type="button"
+              className="btn btn-primary rounded-full px-8"
+              onClick={handleFileUpload}
+              disabled={isUploading || !selectedFile}
+            >
+              {isUploading ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Uploading...
+                </>
+              ) : (
+                "Upload"
+              )}
+            </button>
           </div>
 
           {isUploading && (
@@ -118,7 +151,9 @@ export default function ImageUpload() {
                 <select
                   className="select select-bordered w-full"
                   value={selectedFormat}
-                  onChange={(e) => setSelectedFormat(e.target.value as SocialFormat)}
+                  onChange={(e) =>
+                    setSelectedFormat(e.target.value as SocialFormat)
+                  }
                 >
                   {Object.keys(socialFormats).map((format) => (
                     <option key={format} value={format}>

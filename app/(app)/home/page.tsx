@@ -76,16 +76,21 @@ function Home() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Videos</h2>
           {videos.length > 0 && (
-            <Link href="/all-videos" className="text-primary text-sm font-semibold hover:underline">
+            <Link
+              href="/all-videos"
+              className="text-primary text-sm font-semibold hover:underline"
+            >
               See more →
             </Link>
           )}
         </div>
         {videos.length === 0 ? (
-          <p className="text-base-content opacity-50">No videos uploaded yet.</p>
+          <p className="text-base-content opacity-50">
+            No videos uploaded yet.
+          </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.slice(0, 6).map((video) => (
+            {videos.slice(0, 3).map((video) => (
               <VideoCard
                 key={video.id}
                 video={video}
@@ -103,13 +108,18 @@ function Home() {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Images</h2>
           {images.length > 0 && (
-            <Link href="/all-images" className="text-primary text-sm font-semibold hover:underline">
+            <Link
+              href="/all-images"
+              className="text-primary text-sm font-semibold hover:underline"
+            >
               See more →
             </Link>
           )}
         </div>
         {images.length === 0 ? (
-          <p className="text-base-content opacity-50">No images uploaded yet.</p>
+          <p className="text-base-content opacity-50">
+            No images uploaded yet.
+          </p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
             {images.slice(0, 8).map((image) => (

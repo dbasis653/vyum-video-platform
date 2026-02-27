@@ -16,13 +16,21 @@ interface VideoCardProps {
   onDelete: (id: string) => void;
 }
 
-const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload, onUpdate, onDelete }) => {
+const VideoCard: React.FC<VideoCardProps> = ({
+  video,
+  onDownload,
+  onUpdate,
+  onDelete,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [previewError, setPreviewError] = useState(false);
 
+  const previewDialogRef = useRef<HTMLDialogElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [editTitle, setEditTitle] = useState(video.title);
-  const [editDescription, setEditDescription] = useState(video.description ?? "");
+  const [editDescription, setEditDescription] = useState(
+    video.description ?? "",
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
@@ -62,7 +70,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload, onUpdate, onDe
   }, []);
 
   const compressionPercentage = Math.round(
-    (1 - Number(video.compressedSize) / Number(video.originalSize)) * 100
+    (1 - Number(video.compressedSize) / Number(video.originalSize)) * 100,
   );
 
   const handlePreviewError = () => setPreviewError(true);
@@ -116,9 +124,19 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload, onUpdate, onDe
 
   return (
     <>
+      {/* Card */}
       <div
-        className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
-        onMouseEnter={() => { setIsHovered(true); setPreviewError(false); }}
+        className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer"
+        tabIndex={0}
+        onClick={() => previewDialogRef.current?.showModal()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ")
+            previewDialogRef.current?.showModal();
+        }}
+        onMouseEnter={() => {
+          setIsHovered(true);
+          setPreviewError(false);
+        }}
         onMouseLeave={() => setIsHovered(false)}
       >
         <figure className="aspect-video relative">
@@ -151,7 +169,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload, onUpdate, onDe
         </figure>
         <div className="card-body p-4">
           <h2 className="card-title text-lg font-bold">{video.title}</h2>
-          <p className="text-sm text-base-content opacity-70 mb-4">{video.description}</p>
+          <p className="text-sm text-base-content opacity-70 mb-4">
+            {video.description}
+          </p>
           <p className="text-sm text-base-content opacity-70 mb-4">
             Uploaded {dayjs(video.createdAt).fromNow()}
           </p>
@@ -173,20 +193,27 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload, onUpdate, onDe
           </div>
           <div className="flex justify-between items-center mt-4">
             <div className="text-sm font-semibold">
-              Compression: <span className="text-accent">{compressionPercentage}%</span>
+              Compression:{" "}
+              <span className="text-accent">{compressionPercentage}%</span>
             </div>
             <div className="flex gap-2">
               <button
                 className="btn btn-ghost btn-sm"
-                onClick={openModal}
                 title="Edit video"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openModal();
+                }}
               >
                 <SquarePen size={16} />
               </button>
               <button
                 className="btn btn-primary btn-sm"
-                onClick={() => onDownload(getFullVideoUrl(video.publicId), video.title)}
                 title="Download video"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDownload(getFullVideoUrl(video.publicId), video.title);
+                }}
               >
                 <Download size={16} />
               </button>
@@ -195,10 +222,53 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload, onUpdate, onDe
         </div>
       </div>
 
+      {/* Preview modal */}
+      <dialog ref={previewDialogRef} className="modal">
+        <div className="modal-box max-w-3xl">
+          <video
+            src={getFullVideoUrl(video.publicId)}
+            controls
+            className="w-full rounded-lg max-h-[60vh] object-contain bg-black"
+          />
+          <div className="flex justify-between items-center mt-4">
+            <h3 className="font-bold text-lg">{video.title}</h3>
+            <div className="flex gap-2">
+              <button
+                className="btn btn-ghost btn-sm"
+                title="Edit"
+                onClick={() => {
+                  previewDialogRef.current?.close();
+                  openModal();
+                }}
+              >
+                <SquarePen size={16} />
+              </button>
+              <button
+                className="btn btn-primary btn-sm"
+                title="Download"
+                onClick={() =>
+                  onDownload(getFullVideoUrl(video.publicId), video.title)
+                }
+              >
+                <Download size={16} />
+              </button>
+            </div>
+          </div>
+          <div className="modal-action mt-2">
+            <form method="dialog">
+              <button className="btn btn-ghost btn-sm">Cancel</button>
+            </form>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+
+      {/* Edit modal */}
       <dialog ref={dialogRef} className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg mb-4">Edit Video</h3>
-
           <div className="form-control mb-3">
             <label className="label">
               <span className="label-text font-semibold">
@@ -213,7 +283,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload, onUpdate, onDe
               disabled={busy}
             />
           </div>
-
           <div className="form-control mb-4">
             <label className="label">
               <span className="label-text font-semibold">Description</span>
@@ -226,22 +295,26 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload, onUpdate, onDe
               disabled={busy}
             />
           </div>
-
           {modalError && (
             <p className="text-error text-sm mb-3">{modalError}</p>
           )}
-
           <div className="modal-action flex-wrap gap-2">
             <button
               className="btn btn-error btn-sm"
               onClick={handleDelete}
               disabled={busy}
             >
-              {isDeleting && <span className="loading loading-spinner loading-xs" />}
+              {isDeleting && (
+                <span className="loading loading-spinner loading-xs" />
+              )}
               Delete
             </button>
             <div className="flex-1" />
-            <button className="btn btn-ghost btn-sm" onClick={closeModal} disabled={busy}>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={closeModal}
+              disabled={busy}
+            >
               Cancel
             </button>
             <button
@@ -249,7 +322,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload, onUpdate, onDe
               onClick={handleSave}
               disabled={busy}
             >
-              {isSaving && <span className="loading loading-spinner loading-xs" />}
+              {isSaving && (
+                <span className="loading loading-spinner loading-xs" />
+              )}
               Save
             </button>
           </div>
