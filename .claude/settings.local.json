@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(npx prisma migrate dev --name add-image-model)",
-      "Bash(npx prisma generate)"
+      "Bash(npx prisma generate)",
+      "Bash(npm install svix)",
+      "Bash(npx prisma migrate dev --name add-clerk-user-sync)",
+      "Bash(npx prisma migrate dev --create-only --name add-clerk-user-sync)",
+      "Bash(npx prisma migrate dev)",
+      "Bash(node -e \":*)",
+      "Bash(cmd.exe /c \"start /B ngrok http 3000 --log=stdout > %TEMP%/ngrok.log 2>&1\")",
+      "Bash(curl -s http://localhost:4040/api/tunnels)",
+      "Bash(cmd.exe /c \"ngrok http 3000 2>&1 | more\")",
+      "Bash(cmd.exe /c \"ngrok http 3000 --log=stdout --log-level=debug > \"\"%TEMP%\\\\ngrok_out.txt\"\" 2>&1 & timeout /t 4 /nobreak > nul & type \"\"%TEMP%\\\\ngrok_out.txt\"\"\")",
+      "Bash(cmd.exe /c \"ngrok config check 2>&1\")",
+      "Bash(ls \"c:/Users/Asus/Desktop/WEB DEV PROJECTS/vyum-resizer/\"*.ts)",
+      "Bash(cmd.exe /c \"rmdir /s /q \"\"c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\\\(app\\)\\\\onboarding\"\"\")",
+      "Bash(ls \"c:/Users/Asus/Desktop/WEB DEV PROJECTS/vyum-resizer/app/\\(app\\)/\")",
+      "Bash(powershell.exe -Command \"Remove-Item -Recurse -Force ''c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\\\(app\\)\\\\onboarding''\")",
+      "Bash(npx prisma migrate dev --name add_cascade_delete)"
     ]
   }
 }

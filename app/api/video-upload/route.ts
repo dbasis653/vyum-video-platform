@@ -1,17 +1,27 @@
+/**
+ * app/api/video-upload/route.ts
+ *
+ * POST /api/video-upload
+ *
+ * Uploads a video to Cloudinary with compression, then stores metadata in DB.
+ *
+ * Changes from before:
+ *   1. Replaced the local PrismaClient instantiation (PrismaPg + new PrismaClient)
+ *      with the shared singleton from lib/prisma.ts — avoids connection leaks and
+ *      keeps all DB access consistent.
+ *   2. Removed the `prisma.$disconnect()` in finally — the shared singleton must
+ *      stay connected across requests; disconnecting would break other routes.
+ *   3. The Video row is now linked to the uploading user via userId (FK → User.id).
+ *
+ * How ownership is set:
+ *   After auth(), we look up the User row by clerkId and pass dbUser.id as
+ *   userId when creating the Video record.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
-
 import { v2 as cloudinary } from "cloudinary";
-
 import { auth } from "@clerk/nextjs/server";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/app/generated/prisma/client";
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
-
-//CONCEPT:
-//Upload the video which will have it's metadata, send a response with those metadata
-//so that we can store those metadata in our DB,
+import { prisma } from "@/lib/prisma"; // shared singleton — replaces the old local client
 
 // Configuration
 cloudinary.config({
@@ -24,21 +34,29 @@ interface CloudinaryUploadResult {
   public_id: string;
   bytes: number;
   duration?: number;
-  [key: string]: any; // Include other properties returned by Cloudinary
+  [key: string]: unknown;
 }
 
 export async function POST(request: NextRequest) {
   console.log("post request starts...");
 
+  // 1. Authenticate — must be outside try/catch so the 401 is returned correctly
   const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // 2. Look up the DB User row so we have the internal UUID for the FK.
+  //    The Clerk webhook (user.created) creates this row on first sign-up.
+  const dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
+  if (!dbUser) {
+    return NextResponse.json(
+      { error: "User account not ready. Please refresh and try again." },
+      { status: 404 },
+    );
+  }
 
   try {
-    console.log("try-catch starts...");
-
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     if (
       !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
       !process.env.CLOUDINARY_API_KEY ||
@@ -69,6 +87,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     console.log("arrayBuffer set...");
 
+    // 3. Upload to Cloudinary with auto quality compression
     const result = await new Promise<CloudinaryUploadResult>(
       (resolve, reject) => {
         console.log("upload stream starts to store in cloudinary...");
@@ -90,26 +109,27 @@ export async function POST(request: NextRequest) {
       },
     );
 
-    //store the video info in the DB
+    // 4. Store video metadata in DB, linking it to its owner via userId
     console.log("store the video info in the DB...");
 
     const video = await prisma.video.create({
       data: {
         title,
         description,
-        originalSize: originalSize,
+        originalSize,
         compressedSize: String(result.bytes),
         duration: result.duration || 0,
         publicId: result.public_id,
+        userId: dbUser.id, // ← foreign key linking video to the uploading user
       },
     });
-    console.log("storeed to DB...");
+
+    console.log("stored to DB...");
 
     return NextResponse.json({ video }, { status: 200 });
   } catch (error) {
-    console.log("Upload video falied", error);
+    console.log("Upload video failed", error);
     return NextResponse.json({ error: "Upload video failed" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
+  // Note: no prisma.$disconnect() here — the shared singleton stays alive
 }

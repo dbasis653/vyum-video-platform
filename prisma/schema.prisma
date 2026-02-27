@@ -1,37 +1,71 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
 }
 
+// In Prisma 7, the connection URL lives in prisma.config.ts (datasource.url),
+// not in schema.prisma. The config file already handles DATABASE_URL via dotenv.
 datasource db {
   provider = "postgresql"
-  
 }
 
-model Video{
+// ─────────────────────────────────────────────
+// USER
+// Synced from Clerk via webhook (user.created /
+// user.updated / user.deleted events).
+// username is null until the user completes the
+// onboarding flow and picks a handle.
+// ─────────────────────────────────────────────
+model User {
   id        String   @id @default(uuid())
-  title     String
-  description String?
-  publicId  String
-  originalSize String
-  compressedSize String
-  duration Float
+  clerkId   String   @unique           // Clerk's userId (e.g. "user_2abc...")
+  email     String   @unique
+  username  String?  @unique           // set during onboarding; null until then
+  avatar    String   @default("/images/default-avatar.png")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // One user owns many videos and images
+  videos    Video[]
+  images    Image[]
 }
 
+// ─────────────────────────────────────────────
+// VIDEO
+// Metadata stored after Cloudinary upload.
+// userId links every video to its owner.
+// ─────────────────────────────────────────────
+model Video {
+  id             String   @id @default(uuid())
+  title          String
+  description    String?
+  publicId       String              // Cloudinary public_id for deletion/transforms
+  originalSize   String              // file size before compression (bytes as string)
+  compressedSize String              // file size after compression (bytes as string)
+  duration       Float               // video length in seconds
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Foreign key — every video belongs to one user
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// IMAGE
+// Metadata stored after Cloudinary upload.
+// userId links every image to its owner.
+// ─────────────────────────────────────────────
 model Image {
   id        String   @id @default(uuid())
   title     String
-  publicId  String
+  publicId  String              // Cloudinary public_id
   width     Int
   height    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Foreign key — every image belongs to one user
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
