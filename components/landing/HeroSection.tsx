@@ -5,14 +5,14 @@ export default function HeroSection() {
   return (
     <section
       className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center"
-      style={{ background: "#050a04" }}
+      style={{ background: "#070d1a" }}
     >
       {/* ── Dot grid ── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "radial-gradient(rgba(74,222,128,0.07) 1px, transparent 1px)",
+            "radial-gradient(rgba(34,211,238,0.07) 1px, transparent 1px)",
           backgroundSize: "28px 28px",
         }}
       />
@@ -22,25 +22,25 @@ export default function HeroSection() {
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[720px] h-[420px] pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse, rgba(74,222,128,0.06) 0%, transparent 70%)",
+            "radial-gradient(ellipse, rgba(34,211,238,0.06) 0%, transparent 70%)",
         }}
       />
 
       {/* ── HUD corner brackets ── */}
-      <div className="absolute top-7 left-7 w-9 h-9 border-t-2 border-l-2 border-green-400/25" />
-      <div className="absolute top-7 right-7 w-9 h-9 border-t-2 border-r-2 border-green-400/25" />
-      <div className="absolute bottom-7 left-7 w-9 h-9 border-b-2 border-l-2 border-green-400/25" />
-      <div className="absolute bottom-7 right-7 w-9 h-9 border-b-2 border-r-2 border-green-400/25" />
+      <div className="absolute top-7 left-7 w-9 h-9 border-t-2 border-l-2 border-blue-400/25" />
+      <div className="absolute top-7 right-7 w-9 h-9 border-t-2 border-r-2 border-blue-400/25" />
+      <div className="absolute bottom-7 left-7 w-9 h-9 border-b-2 border-l-2 border-blue-400/25" />
+      <div className="absolute bottom-7 right-7 w-9 h-9 border-b-2 border-r-2 border-blue-400/25" />
 
       {/* ── Top status label ── */}
       <div className="absolute top-7 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
         <span
           className="w-1.5 h-1.5 rounded-full animate-pulse"
-          style={{ background: "#4ade80" }}
+          style={{ background: "#3B82F6" }}
         />
         <span
           className="text-[10px] font-mono tracking-[0.35em] uppercase"
-          style={{ color: "rgba(74,222,128,0.4)" }}
+          style={{ color: "rgba(34,211,238,0.4)" }}
         >
           Media Engine
         </span>
@@ -56,7 +56,7 @@ export default function HeroSection() {
           width={340}
           height={136}
           className="object-contain"
-          style={{ filter: "drop-shadow(0 0 48px rgba(74,222,128,0.22))" }}
+          style={{ filter: "drop-shadow(0 0 48px rgba(34,211,238,0.22))" }}
           priority
         />
 
@@ -74,22 +74,22 @@ export default function HeroSection() {
         <div className="flex items-center gap-3 my-7">
           <div
             className="w-20 h-px"
-            style={{ background: "rgba(74,222,128,0.18)" }}
+            style={{ background: "rgba(34,211,238,0.18)" }}
           />
           <div
             className="w-1 h-1 rounded-full"
-            style={{ background: "rgba(74,222,128,0.5)" }}
+            style={{ background: "rgba(34,211,238,0.5)" }}
           />
           <div
             className="w-20 h-px"
-            style={{ background: "rgba(74,222,128,0.18)" }}
+            style={{ background: "rgba(34,211,238,0.18)" }}
           />
         </div>
 
         {/* Tagline */}
         <p
           className="text-[11px] font-mono tracking-[0.5em] uppercase mb-8"
-          style={{ color: "rgba(187,240,166,0.38)" }}
+          style={{ color: "rgba(186,230,255,0.38)" }}
         >
           Compress&nbsp;&nbsp;·&nbsp;&nbsp;Crop&nbsp;&nbsp;·&nbsp;&nbsp;Share
         </p>
@@ -99,16 +99,16 @@ export default function HeroSection() {
           <Link
             href="/sign-in"
             className="px-9 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase transition-opacity hover:opacity-85"
-            style={{ background: "#4ade80", color: "#052e16" }}
+            style={{ background: "#3B82F6", color: "#0B1220" }}
           >
             Sign In
           </Link>
           <Link
             href="/sign-up"
-            className="px-9 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase transition-colors hover:border-green-400/50"
+            className="px-9 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase transition-colors hover:border-blue-400/50"
             style={{
-              border: "1px solid rgba(74,222,128,0.28)",
-              color: "#4ade80",
+              border: "1px solid rgba(34,211,238,0.28)",
+              color: "#22D3EE",
             }}
           >
             Get Started
@@ -123,8 +123,8 @@ export default function HeroSection() {
         <div
           className="relative w-36 h-[76px] rounded-lg overflow-hidden flex items-center justify-center"
           style={{
-            background: "rgba(74,222,128,0.03)",
-            border: "1px solid rgba(74,222,128,0.1)",
+            background: "rgba(34,211,238,0.03)",
+            border: "1px solid rgba(34,211,238,0.1)",
           }}
         >
           {/* Simulated video frame bars */}
@@ -133,7 +133,7 @@ export default function HeroSection() {
               <div
                 key={i}
                 className="flex-1 rounded-sm"
-                style={{ background: `rgba(74,222,128,${op})` }}
+                style={{ background: `rgba(34,211,238,${op})` }}
               />
             ))}
           </div>
@@ -141,8 +141,8 @@ export default function HeroSection() {
           <div
             className="relative z-10 w-7 h-7 rounded-full flex items-center justify-center"
             style={{
-              background: "rgba(74,222,128,0.12)",
-              border: "1px solid rgba(74,222,128,0.28)",
+              background: "rgba(34,211,238,0.12)",
+              border: "1px solid rgba(34,211,238,0.28)",
             }}
           >
             <div
@@ -152,13 +152,13 @@ export default function HeroSection() {
                 height: 0,
                 borderTop: "5px solid transparent",
                 borderBottom: "5px solid transparent",
-                borderLeft: "8px solid rgba(74,222,128,0.72)",
+                borderLeft: "8px solid rgba(34,211,238,0.72)",
               }}
             />
           </div>
           <span
             className="absolute bottom-1.5 right-2 text-[8px] font-mono tracking-widest"
-            style={{ color: "rgba(74,222,128,0.28)" }}
+            style={{ color: "rgba(34,211,238,0.28)" }}
           >
             VIDEO
           </span>
@@ -168,8 +168,8 @@ export default function HeroSection() {
         <div
           className="w-44 h-[96px] rounded-lg flex flex-col items-center justify-center gap-2"
           style={{
-            background: "rgba(74,222,128,0.045)",
-            border: "1px solid rgba(74,222,128,0.14)",
+            background: "rgba(34,211,238,0.045)",
+            border: "1px solid rgba(34,211,238,0.14)",
           }}
         >
           <div className="flex items-end gap-[3px] h-7">
@@ -179,7 +179,7 @@ export default function HeroSection() {
                 className="w-[3px] rounded-full animate-pulse"
                 style={{
                   height: `${h}px`,
-                  background: "rgba(74,222,128,0.5)",
+                  background: "rgba(34,211,238,0.5)",
                   animationDelay: `${i * 0.1}s`,
                 }}
               />
@@ -187,7 +187,7 @@ export default function HeroSection() {
           </div>
           <span
             className="text-[9px] font-mono tracking-[0.28em] uppercase"
-            style={{ color: "rgba(74,222,128,0.38)" }}
+            style={{ color: "rgba(34,211,238,0.38)" }}
           >
             Compressing
           </span>
@@ -197,45 +197,45 @@ export default function HeroSection() {
         <div
           className="relative w-36 h-[76px] rounded-lg overflow-hidden flex items-center justify-center"
           style={{
-            background: "rgba(74,222,128,0.03)",
-            border: "1px solid rgba(74,222,128,0.1)",
+            background: "rgba(34,211,238,0.03)",
+            border: "1px solid rgba(34,211,238,0.1)",
           }}
         >
           {/* Crop grid */}
           <div
             className="absolute inset-2 border border-dashed"
-            style={{ borderColor: "rgba(74,222,128,0.14)" }}
+            style={{ borderColor: "rgba(34,211,238,0.14)" }}
           >
             <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
               {Array.from({ length: 9 }).map((_, i) => (
                 <div
                   key={i}
                   className="border"
-                  style={{ borderColor: "rgba(74,222,128,0.07)" }}
+                  style={{ borderColor: "rgba(34,211,238,0.07)" }}
                 />
               ))}
             </div>
             {/* Crop corner markers */}
             <div
               className="absolute top-0 left-0 w-2 h-2 border-t border-l"
-              style={{ borderColor: "rgba(74,222,128,0.55)" }}
+              style={{ borderColor: "rgba(34,211,238,0.55)" }}
             />
             <div
               className="absolute top-0 right-0 w-2 h-2 border-t border-r"
-              style={{ borderColor: "rgba(74,222,128,0.55)" }}
+              style={{ borderColor: "rgba(34,211,238,0.55)" }}
             />
             <div
               className="absolute bottom-0 left-0 w-2 h-2 border-b border-l"
-              style={{ borderColor: "rgba(74,222,128,0.55)" }}
+              style={{ borderColor: "rgba(34,211,238,0.55)" }}
             />
             <div
               className="absolute bottom-0 right-0 w-2 h-2 border-b border-r"
-              style={{ borderColor: "rgba(74,222,128,0.55)" }}
+              style={{ borderColor: "rgba(34,211,238,0.55)" }}
             />
           </div>
           <span
             className="absolute bottom-1.5 right-2 text-[8px] font-mono tracking-widest"
-            style={{ color: "rgba(74,222,128,0.28)" }}
+            style={{ color: "rgba(34,211,238,0.28)" }}
           >
             IMAGE
           </span>
@@ -246,17 +246,17 @@ export default function HeroSection() {
       <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2.5 z-10">
         <div
           className="w-20 h-px"
-          style={{ background: "rgba(74,222,128,0.1)" }}
+          style={{ background: "rgba(34,211,238,0.1)" }}
         />
         <span
           className="text-[9px] font-mono tracking-widest"
-          style={{ color: "rgba(74,222,128,0.18)" }}
+          style={{ color: "rgba(34,211,238,0.18)" }}
         >
           VYUM · READY
         </span>
         <div
           className="w-20 h-px"
-          style={{ background: "rgba(74,222,128,0.1)" }}
+          style={{ background: "rgba(34,211,238,0.1)" }}
         />
       </div>
     </section>

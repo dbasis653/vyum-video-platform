@@ -29,11 +29,7 @@
  *
  * Auth-gated but NOT onboarding-gated:
  *   /onboarding           — the username-pick page itself (must stay reachable
- *                           before onboarding is complete; if already complete,
- *                           redirected to /home)
- *   /api/user/onboarding  — the PATCH endpoint called by the onboarding form;
- *                           always let through (onboardingComplete is still false
- *                           at submit time, so we can't gate it)
+ *                           before onboarding is complete)
  *
  * Note on removed isPublicApiRoute from proxy.ts:
  *   /api/videos and /api/images were previously listed as public API routes because
@@ -93,31 +89,9 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
-  // 4. Onboarding routes — two sub-cases:
-  if (isOnboardingRoute(req)) {
-    // 4a. API route: always let through. The PATCH is fired while onboardingComplete
-    //     is still false, so checking the flag here would block the submission.
-    if (req.nextUrl.pathname.startsWith("/api/user/onboarding")) return;
-
-    // 4b. Onboarding PAGE: redirect to /home if the user already finished onboarding.
-    //     Fast path — JWT flag is up-to-date.
-    const claimsComplete =
-      (sessionClaims?.publicMetadata as { onboardingComplete?: boolean })
-        ?.onboardingComplete ?? false;
-    if (claimsComplete) return NextResponse.redirect(new URL("/home", req.url));
-
-    //     Slow path — JWT might be stale (up to ~60s after onboarding completes).
-    const clientForOnboarding = await clerkClient();
-    const userForOnboarding = await clientForOnboarding.users.getUser(userId!);
-    const backendCompleteForOnboarding =
-      (userForOnboarding.publicMetadata as { onboardingComplete?: boolean })
-        ?.onboardingComplete ?? false;
-    if (backendCompleteForOnboarding)
-      return NextResponse.redirect(new URL("/home", req.url));
-
-    // Not yet onboarded — let them through to the page.
-    return;
-  }
+  // 4. User is authenticated — let them reach /onboarding without checking
+  //    whether onboarding is complete (would cause an infinite redirect loop).
+  if (isOnboardingRoute(req)) return;
 
   // 5. Onboarding gate.
   //

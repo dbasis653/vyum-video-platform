@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { CldImage } from "next-cloudinary";
+import { UploadIcon, DownloadIcon } from "lucide-react";
 
 const socialFormats = {
   "Instagram Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
@@ -81,31 +82,48 @@ export default function ImageUpload() {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6 text-center">Image Upload</h1>
+    <div className="max-w-3xl mx-auto">
+      {/* HUD page header */}
+      <div className="flex items-center gap-3 mb-7">
+        <div className="w-0.5 h-4 rounded-full" style={{ background: "#3B82F6" }} />
+        <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "#22D3EE" }}>
+          Image Upload
+        </span>
+        <div className="flex-1 h-px" style={{ background: "rgba(34,211,238,0.1)" }} />
+      </div>
 
-      <div className="card">
-        <div className="card-body">
-          <h2 className="card-title mb-4">Upload an Image</h2>
-
-          <div className="form-control mb-3">
-            <label className="label">
-              <span className="label-text">
-                Title <span className="text-error">*</span>
-              </span>
+      {/* Upload card */}
+      <div
+        className="rounded-2xl p-6 mb-6"
+        style={{
+          background: "#0f1929",
+          border: "1px solid rgba(34,211,238,0.12)",
+        }}
+      >
+        <div className="flex flex-col gap-5">
+          {/* Title */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-mono" style={{ color: "rgba(186,230,255,0.55)" }}>
+              Title <span style={{ color: "#f87171" }}>*</span>
             </label>
             <input
               type="text"
-              className="input input-bordered w-full"
+              className="w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-colors"
+              style={{
+                background: "#132033",
+                border: "1px solid rgba(34,211,238,0.15)",
+                color: "#bfdbfe",
+              }}
               placeholder="Enter image title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">Choose an image file</span>
+          {/* File picker */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-mono" style={{ color: "rgba(186,230,255,0.55)" }}>
+              Image File
             </label>
             <input
               type="file"
@@ -114,87 +132,126 @@ export default function ImageUpload() {
               className="file-input file-input-bordered file-input-primary w-full"
             />
             {selectedFile && (
-              <p className="mt-2 text-sm text-base-content opacity-70">
+              <p className="text-[10px] font-mono mt-0.5" style={{ color: "rgba(186,230,255,0.35)" }}>
                 Selected: {selectedFile.name}
               </p>
             )}
           </div>
 
-          <div className="mt-4">
-            <button
-              type="button"
-              className="btn btn-primary rounded-full px-8"
-              onClick={handleFileUpload}
-              disabled={isUploading || !selectedFile}
-            >
-              {isUploading ? (
-                <>
-                  <span className="loading loading-spinner loading-sm"></span>
-                  Uploading...
-                </>
-              ) : (
-                "Upload"
-              )}
-            </button>
-          </div>
+          {/* Upload button */}
+          <button
+            type="button"
+            onClick={handleFileUpload}
+            disabled={isUploading || !selectedFile}
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-sm font-semibold transition-all"
+            style={{
+              background: isUploading || !selectedFile ? "rgba(34,211,238,0.15)" : "#22D3EE",
+              color: isUploading || !selectedFile ? "rgba(34,211,238,0.4)" : "#0B1220",
+              cursor: isUploading || !selectedFile ? "not-allowed" : "pointer",
+            }}
+          >
+            {isUploading ? (
+              <>
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Uploading…
+              </>
+            ) : (
+              <>
+                <UploadIcon size={15} />
+                Upload Image
+              </>
+            )}
+          </button>
 
-          {isUploading && (
-            <div className="mt-4">
-              <progress className="progress progress-primary w-full"></progress>
-            </div>
-          )}
-
-          {uploadedImage && (
-            <div className="mt-6">
-              <h2 className="card-title mb-4">Select Social Media Format</h2>
-              <div className="form-control">
-                <select
-                  className="select select-bordered w-full"
-                  value={selectedFormat}
-                  onChange={(e) =>
-                    setSelectedFormat(e.target.value as SocialFormat)
-                  }
-                >
-                  {Object.keys(socialFormats).map((format) => (
-                    <option key={format} value={format}>
-                      {format}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mt-6 relative">
-                <h3 className="text-lg font-semibold mb-2">Preview:</h3>
-                <div className="flex justify-center">
-                  {isTransforming && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-base-100 bg-opacity-50 z-10">
-                      <span className="loading loading-spinner loading-lg"></span>
-                    </div>
-                  )}
-                  <CldImage
-                    width={socialFormats[selectedFormat].width}
-                    height={socialFormats[selectedFormat].height}
-                    src={uploadedImage}
-                    sizes="100vw"
-                    alt="transformed image"
-                    crop="fill"
-                    aspectRatio={socialFormats[selectedFormat].aspectRatio}
-                    gravity="auto"
-                    ref={imageRef}
-                    onLoad={() => setIsTransforming(false)}
-                  />
-                </div>
-              </div>
-
-              <div className="card-actions justify-end mt-6">
-                <button className="btn btn-primary" onClick={handleDownload}>
-                  Download for {selectedFormat}
-                </button>
-              </div>
-            </div>
-          )}
+          {isUploading && <progress className="progress progress-primary w-full" />}
         </div>
       </div>
+
+      {/* Format + preview card */}
+      {uploadedImage && (
+        <div
+          className="rounded-2xl p-6"
+          style={{
+            background: "#0f1929",
+            border: "1px solid rgba(34,211,238,0.12)",
+          }}
+        >
+          {/* Format selector */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-0.5 h-4 rounded-full" style={{ background: "#3B82F6" }} />
+            <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "#22D3EE" }}>
+              Social Format
+            </span>
+            <div className="flex-1 h-px" style={{ background: "rgba(34,211,238,0.1)" }} />
+          </div>
+
+          <select
+            className="select select-bordered w-full mb-6"
+            value={selectedFormat}
+            onChange={(e) => setSelectedFormat(e.target.value as SocialFormat)}
+          >
+            {Object.keys(socialFormats).map((format) => (
+              <option key={format} value={format}>
+                {format}
+              </option>
+            ))}
+          </select>
+
+          {/* Preview */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-0.5 h-4 rounded-full" style={{ background: "#3B82F6" }} />
+            <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "#22D3EE" }}>
+              Preview
+            </span>
+            <div className="flex-1 h-px" style={{ background: "rgba(34,211,238,0.1)" }} />
+          </div>
+
+          <div
+            className="relative flex justify-center rounded-xl overflow-hidden"
+            style={{ background: "#0B1220", border: "1px solid rgba(34,211,238,0.08)" }}
+          >
+            {isTransforming && (
+              <div
+                className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10"
+                style={{ background: "rgba(11,18,32,0.75)" }}
+              >
+                <svg className="animate-spin w-7 h-7" fill="none" viewBox="0 0 24 24" style={{ color: "#22D3EE" }}>
+                  <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span className="text-xs font-mono" style={{ color: "rgba(34,211,238,0.5)" }}>Transforming…</span>
+              </div>
+            )}
+            <CldImage
+              width={socialFormats[selectedFormat].width}
+              height={socialFormats[selectedFormat].height}
+              src={uploadedImage}
+              sizes="100vw"
+              alt="transformed image"
+              crop="fill"
+              aspectRatio={socialFormats[selectedFormat].aspectRatio}
+              gravity="auto"
+              ref={imageRef}
+              onLoad={() => setIsTransforming(false)}
+            />
+          </div>
+
+          {/* Download */}
+          <div className="flex justify-end mt-5">
+            <button
+              className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
+              style={{ background: "#3B82F6", color: "#0B1220" }}
+              onClick={handleDownload}
+            >
+              <DownloadIcon size={15} />
+              Download for {selectedFormat}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

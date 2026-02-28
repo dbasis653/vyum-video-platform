@@ -2,12 +2,12 @@ import { SignIn } from "@clerk/nextjs";
 
 const appearance = {
   variables: {
-    colorPrimary: "#4ade80",
-    colorBackground: "#192512",
-    colorInputBackground: "#1f2d1c",
-    colorText: "#d4edbb",
-    colorTextSecondary: "#7ba86a",
-    colorInputText: "#d4edbb",
+    colorPrimary: "#3B82F6",
+    colorBackground: "#0f1929",
+    colorInputBackground: "#132033",
+    colorText: "#bfdbfe",
+    colorTextSecondary: "#60a5fa",
+    colorInputText: "#bfdbfe",
     colorDanger: "#f87171",
     borderRadius: "0.5rem",
     fontFamily: "inherit",

@@ -17,7 +17,12 @@
       "Bash(cmd.exe /c \"rmdir /s /q \"\"c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\\\(app\\)\\\\onboarding\"\"\")",
       "Bash(ls \"c:/Users/Asus/Desktop/WEB DEV PROJECTS/vyum-resizer/app/\\(app\\)/\")",
       "Bash(powershell.exe -Command \"Remove-Item -Recurse -Force ''c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\\\(app\\)\\\\onboarding''\")",
-      "Bash(npx prisma migrate dev --name add_cascade_delete)"
+      "Bash(npx prisma migrate dev --name add_cascade_delete)",
+      "Bash(__NEW_LINE_73e24e74aa4358b3__ echo \"\")",
+      "Bash(__NEW_LINE_5fd7560256f72751__ echo \"=== Blue solid buttons \\(#3B82F6\\) ===\")",
+      "Bash(__NEW_LINE_5fd7560256f72751__ echo \"\")",
+      "Bash(__NEW_LINE_2f69d73a4cd67a1a__ echo \"\")",
+      "Bash(node recolor.mjs)"
     ]
   }
 }

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @plugin "daisyui" {
-  themes: forest --default;
+  themes: night --default;
 }
 
 body {
@@ -10,7 +10,7 @@ body {
 
 /* @import "tailwindcss";
 @plugin "daisyui" {
-  themes: forest --default;
+  themes: night --default;
 }
 
 :root {

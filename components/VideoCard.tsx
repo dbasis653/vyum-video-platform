@@ -122,11 +122,23 @@ const VideoCard: React.FC<VideoCardProps> = ({
 
   const busy = isSaving || isDeleting;
 
+  /* ── Shared spinner SVG ── */
+  const Spinner = () => (
+    <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+  );
+
   return (
     <>
-      {/* Card */}
+      {/* ── Card ── */}
       <div
-        className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer"
+        className="relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 group"
+        style={{
+          background: "#0f1929",
+          border: "1px solid rgba(34,211,238,0.13)",
+        }}
         tabIndex={0}
         onClick={() => previewDialogRef.current?.showModal()}
         onKeyDown={(e) => {
@@ -139,11 +151,17 @@ const VideoCard: React.FC<VideoCardProps> = ({
         }}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <figure className="aspect-video relative">
+        {/* Thumbnail / preview */}
+        <div className="aspect-video relative overflow-hidden">
           {isHovered ? (
             previewError ? (
-              <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                <p className="text-red-500">Preview not available</p>
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{ background: "#132033" }}
+              >
+                <p className="text-xs font-mono" style={{ color: "rgba(248,113,113,0.6)" }}>
+                  Preview unavailable
+                </p>
               </div>
             ) : (
               <video
@@ -159,104 +177,174 @@ const VideoCard: React.FC<VideoCardProps> = ({
             <img
               src={getThumbnailUrl(video.publicId)}
               alt={video.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
             />
           )}
-          <div className="absolute bottom-2 right-2 bg-base-100 bg-opacity-70 px-2 py-1 rounded-lg text-sm flex items-center">
-            <Clock size={16} className="mr-1" />
+
+          {/* Duration badge */}
+          <div
+            className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 rounded-md text-xs font-mono"
+            style={{
+              background: "rgba(7,13,26,0.82)",
+              border: "1px solid rgba(34,211,238,0.2)",
+              color: "#22D3EE",
+            }}
+          >
+            <Clock size={11} />
             {formatDuration(video.duration)}
           </div>
-        </figure>
-        <div className="card-body p-4">
-          <h2 className="card-title text-lg font-bold">{video.title}</h2>
-          <p className="text-sm text-base-content opacity-70 mb-4">
-            {video.description}
-          </p>
-          <p className="text-sm text-base-content opacity-70 mb-4">
-            Uploaded {dayjs(video.createdAt).fromNow()}
-          </p>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center">
-              <FileUp size={18} className="mr-2 text-primary" />
+        </div>
+
+        {/* Body */}
+        <div className="p-4 flex flex-col gap-3">
+          {/* Title + meta */}
+          <div>
+            <h2 className="font-bold text-sm leading-snug truncate" style={{ color: "#bfdbfe" }}>
+              {video.title}
+            </h2>
+            {video.description && (
+              <p className="text-xs mt-1 line-clamp-2" style={{ color: "rgba(186,230,255,0.42)" }}>
+                {video.description}
+              </p>
+            )}
+            <p className="text-xs mt-1 font-mono" style={{ color: "rgba(186,230,255,0.28)" }}>
+              {dayjs(video.createdAt).fromNow()}
+            </p>
+          </div>
+
+          {/* Size stats */}
+          <div
+            className="grid grid-cols-2 gap-2 rounded-lg p-3 text-xs"
+            style={{
+              background: "rgba(34,211,238,0.04)",
+              border: "1px solid rgba(34,211,238,0.08)",
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <FileUp size={13} style={{ color: "rgba(34,211,238,0.45)" }} />
               <div>
-                <div className="font-semibold">Original</div>
-                <div>{formatSize(Number(video.originalSize))}</div>
+                <div className="font-mono" style={{ color: "rgba(186,230,255,0.38)" }}>Original</div>
+                <div className="font-semibold" style={{ color: "#bfdbfe" }}>
+                  {formatSize(Number(video.originalSize))}
+                </div>
               </div>
             </div>
-            <div className="flex items-center">
-              <FileDown size={18} className="mr-2 text-secondary" />
+            <div className="flex items-center gap-2">
+              <FileDown size={13} style={{ color: "#22D3EE" }} />
               <div>
-                <div className="font-semibold">Compressed</div>
-                <div>{formatSize(Number(video.compressedSize))}</div>
+                <div className="font-mono" style={{ color: "rgba(186,230,255,0.38)" }}>Compressed</div>
+                <div className="font-semibold" style={{ color: "#22D3EE" }}>
+                  {formatSize(Number(video.compressedSize))}
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex justify-between items-center mt-4">
-            <div className="text-sm font-semibold">
-              Compression:{" "}
-              <span className="text-accent">{compressionPercentage}%</span>
-            </div>
-            <div className="flex gap-2">
+
+          {/* Compression badge + actions */}
+          <div className="flex items-center justify-between">
+            <span
+              className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold"
+              style={{
+                background: "rgba(34,211,238,0.1)",
+                border: "1px solid rgba(34,211,238,0.18)",
+                color: "#22D3EE",
+              }}
+            >
+              -{compressionPercentage}% compressed
+            </span>
+
+            <div className="flex gap-1.5">
               <button
-                className="btn btn-ghost btn-sm"
-                title="Edit video"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openModal();
+                className="flex items-center justify-center w-7 h-7 rounded-lg transition-all"
+                style={{
+                  background: "rgba(34,211,238,0.06)",
+                  border: "1px solid rgba(34,211,238,0.12)",
+                  color: "rgba(186,230,255,0.55)",
                 }}
+                title="Edit video"
+                onClick={(e) => { e.stopPropagation(); openModal(); }}
               >
-                <SquarePen size={16} />
+                <SquarePen size={13} />
               </button>
               <button
-                className="btn btn-primary btn-sm"
+                className="flex items-center justify-center w-7 h-7 rounded-lg transition-all"
+                style={{
+                  background: "rgba(34,211,238,0.12)",
+                  border: "1px solid rgba(34,211,238,0.22)",
+                  color: "#22D3EE",
+                }}
                 title="Download video"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDownload(getFullVideoUrl(video.publicId), video.title);
                 }}
               >
-                <Download size={16} />
+                <Download size={13} />
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Preview modal */}
+      {/* ── Preview modal ── */}
       <dialog ref={previewDialogRef} className="modal">
-        <div className="modal-box max-w-3xl">
+        <div
+          className="modal-box max-w-3xl"
+          style={{
+            background: "#0f1929",
+            border: "1px solid rgba(34,211,238,0.15)",
+          }}
+        >
           <video
             src={getFullVideoUrl(video.publicId)}
             controls
-            className="w-full rounded-lg max-h-[60vh] object-contain bg-black"
+            className="w-full rounded-xl max-h-[60vh] object-contain"
+            style={{ background: "#070d1a" }}
           />
           <div className="flex justify-between items-center mt-4">
-            <h3 className="font-bold text-lg">{video.title}</h3>
+            <h3 className="font-bold text-sm" style={{ color: "#bfdbfe" }}>
+              {video.title}
+            </h3>
             <div className="flex gap-2">
               <button
-                className="btn btn-ghost btn-sm"
-                title="Edit"
-                onClick={() => {
-                  previewDialogRef.current?.close();
-                  openModal();
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all"
+                style={{
+                  background: "rgba(34,211,238,0.06)",
+                  border: "1px solid rgba(34,211,238,0.12)",
+                  color: "rgba(186,230,255,0.55)",
                 }}
+                title="Edit"
+                onClick={() => { previewDialogRef.current?.close(); openModal(); }}
               >
-                <SquarePen size={16} />
+                <SquarePen size={12} />
+                Edit
               </button>
               <button
-                className="btn btn-primary btn-sm"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all"
+                style={{
+                  background: "rgba(34,211,238,0.12)",
+                  border: "1px solid rgba(34,211,238,0.22)",
+                  color: "#22D3EE",
+                }}
                 title="Download"
-                onClick={() =>
-                  onDownload(getFullVideoUrl(video.publicId), video.title)
-                }
+                onClick={() => onDownload(getFullVideoUrl(video.publicId), video.title)}
               >
-                <Download size={16} />
+                <Download size={12} />
+                Download
               </button>
             </div>
           </div>
           <div className="modal-action mt-2">
             <form method="dialog">
-              <button className="btn btn-ghost btn-sm">Cancel</button>
+              <button
+                className="px-4 py-1.5 rounded-lg text-xs font-mono transition-all"
+                style={{
+                  border: "1px solid rgba(34,211,238,0.12)",
+                  color: "rgba(186,230,255,0.4)",
+                }}
+              >
+                Close
+              </button>
             </form>
           </div>
         </div>
@@ -265,66 +353,102 @@ const VideoCard: React.FC<VideoCardProps> = ({
         </form>
       </dialog>
 
-      {/* Edit modal */}
+      {/* ── Edit modal ── */}
       <dialog ref={dialogRef} className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg mb-4">Edit Video</h3>
-          <div className="form-control mb-3">
-            <label className="label">
-              <span className="label-text font-semibold">
-                Title <span className="text-error">*</span>
-              </span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              disabled={busy}
-            />
+        <div
+          className="modal-box"
+          style={{
+            background: "#0f1929",
+            border: "1px solid rgba(34,211,238,0.15)",
+          }}
+        >
+          <h3
+            className="text-xs font-mono tracking-widest uppercase mb-5"
+            style={{ color: "#22D3EE" }}
+          >
+            Edit Video
+          </h3>
+
+          <div className="flex flex-col gap-4 mb-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-mono" style={{ color: "rgba(186,230,255,0.5)" }}>
+                Title <span style={{ color: "#f87171" }}>*</span>
+              </label>
+              <input
+                type="text"
+                className="w-full rounded-lg px-3 py-2.5 text-sm outline-none"
+                style={{
+                  background: "#132033",
+                  border: "1px solid rgba(34,211,238,0.15)",
+                  color: "#bfdbfe",
+                }}
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                disabled={busy}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-mono" style={{ color: "rgba(186,230,255,0.5)" }}>
+                Description
+              </label>
+              <textarea
+                className="w-full rounded-lg px-3 py-2.5 text-sm outline-none resize-none"
+                style={{
+                  background: "#132033",
+                  border: "1px solid rgba(34,211,238,0.15)",
+                  color: "#bfdbfe",
+                }}
+                rows={3}
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                disabled={busy}
+              />
+            </div>
           </div>
-          <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text font-semibold">Description</span>
-            </label>
-            <textarea
-              className="textarea textarea-bordered w-full"
-              rows={3}
-              value={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-              disabled={busy}
-            />
-          </div>
+
           {modalError && (
-            <p className="text-error text-sm mb-3">{modalError}</p>
+            <p className="text-xs mb-3 font-mono" style={{ color: "#f87171" }}>
+              {modalError}
+            </p>
           )}
+
           <div className="modal-action flex-wrap gap-2">
             <button
-              className="btn btn-error btn-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all"
+              style={{
+                background: "rgba(248,113,113,0.07)",
+                border: "1px solid rgba(248,113,113,0.18)",
+                color: "rgba(248,113,113,0.75)",
+              }}
               onClick={handleDelete}
               disabled={busy}
             >
-              {isDeleting && (
-                <span className="loading loading-spinner loading-xs" />
-              )}
+              {isDeleting && <Spinner />}
               Delete
             </button>
             <div className="flex-1" />
             <button
-              className="btn btn-ghost btn-sm"
+              className="px-3 py-1.5 rounded-lg text-xs font-mono transition-all"
+              style={{
+                border: "1px solid rgba(34,211,238,0.12)",
+                color: "rgba(186,230,255,0.4)",
+              }}
               onClick={closeModal}
               disabled={busy}
             >
               Cancel
             </button>
             <button
-              className="btn btn-primary btn-sm"
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={{
+                background: busy ? "rgba(34,211,238,0.15)" : "#22D3EE",
+                color: busy ? "rgba(34,211,238,0.4)" : "#0B1220",
+                cursor: busy ? "not-allowed" : "pointer",
+              }}
               onClick={handleSave}
               disabled={busy}
             >
-              {isSaving && (
-                <span className="loading loading-spinner loading-xs" />
-              )}
+              {isSaving && <Spinner />}
               Save
             </button>
           </div>

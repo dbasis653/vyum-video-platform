@@ -5,6 +5,7 @@ import Link from "next/link";
 import VideoCard from "@/components/VideoCard";
 import ImageCard from "@/components/ImageCard";
 import { Video, ImageItem } from "@/types";
+import { VideoIcon, ImageIcon } from "lucide-react";
 
 function Home() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -59,37 +60,76 @@ function Home() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[40vh]">
-        <span className="loading loading-spinner loading-lg" />
+      <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3">
+        <svg
+          className="animate-spin w-7 h-7"
+          fill="none"
+          viewBox="0 0 24 24"
+          style={{ color: "#22D3EE" }}
+        >
+          <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        <span className="text-xs font-mono tracking-widest" style={{ color: "rgba(34,211,238,0.4)" }}>
+          Loading…
+        </span>
       </div>
     );
   }
 
   if (error) {
-    return <div className="text-center text-error mt-8">{error}</div>;
+    return (
+      <div
+        className="flex items-center gap-2.5 px-4 py-3 rounded-lg text-sm mt-8"
+        style={{
+          background: "rgba(248,113,113,0.07)",
+          border: "1px solid rgba(248,113,113,0.18)",
+          color: "#fca5a5",
+        }}
+      >
+        {error}
+      </div>
+    );
   }
 
   return (
     <div className="space-y-10">
-      {/* Videos Section */}
+      {/* ── Videos section ── */}
       <section>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Videos</h2>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-0.5 h-4 rounded-full" style={{ background: "#3B82F6" }} />
+          <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "#22D3EE" }}>
+            Videos
+          </span>
+          <div className="flex-1 h-px" style={{ background: "rgba(34,211,238,0.1)" }} />
           {videos.length > 0 && (
             <Link
               href="/all-videos"
-              className="text-primary text-sm font-semibold hover:underline"
+              className="text-xs font-mono tracking-wider transition-opacity hover:opacity-75"
+              style={{ color: "rgba(34,211,238,0.6)" }}
             >
-              See more →
+              See all →
             </Link>
           )}
         </div>
+
         {videos.length === 0 ? (
-          <p className="text-base-content opacity-50">
-            No videos uploaded yet.
-          </p>
+          <div className="flex flex-col items-center py-12 gap-3">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{
+                background: "rgba(34,211,238,0.06)",
+                border: "1px solid rgba(34,211,238,0.12)",
+              }}
+            >
+              <VideoIcon size={18} style={{ color: "rgba(34,211,238,0.4)" }} />
+            </div>
+            <p className="text-xs font-mono" style={{ color: "rgba(186,230,255,0.28)" }}>
+              No videos uploaded yet
+            </p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {videos.slice(0, 3).map((video) => (
               <VideoCard
                 key={video.id}
@@ -103,23 +143,40 @@ function Home() {
         )}
       </section>
 
-      {/* Images Section */}
+      {/* ── Images section ── */}
       <section>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Images</h2>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-0.5 h-4 rounded-full" style={{ background: "#3B82F6" }} />
+          <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "#22D3EE" }}>
+            Images
+          </span>
+          <div className="flex-1 h-px" style={{ background: "rgba(34,211,238,0.1)" }} />
           {images.length > 0 && (
             <Link
               href="/all-images"
-              className="text-primary text-sm font-semibold hover:underline"
+              className="text-xs font-mono tracking-wider transition-opacity hover:opacity-75"
+              style={{ color: "rgba(34,211,238,0.6)" }}
             >
-              See more →
+              See all →
             </Link>
           )}
         </div>
+
         {images.length === 0 ? (
-          <p className="text-base-content opacity-50">
-            No images uploaded yet.
-          </p>
+          <div className="flex flex-col items-center py-12 gap-3">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{
+                background: "rgba(34,211,238,0.06)",
+                border: "1px solid rgba(34,211,238,0.12)",
+              }}
+            >
+              <ImageIcon size={18} style={{ color: "rgba(34,211,238,0.4)" }} />
+            </div>
+            <p className="text-xs font-mono" style={{ color: "rgba(186,230,255,0.28)" }}>
+              No images uploaded yet
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
             {images.slice(0, 8).map((image) => (

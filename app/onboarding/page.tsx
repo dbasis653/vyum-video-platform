@@ -62,14 +62,14 @@ export default function OnboardingPage() {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden"
-      style={{ background: "#0e1a0b" }}
+      style={{ background: "#0B1220" }}
     >
       {/* Radial glow behind the card */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[640px] rounded-full pointer-events-none"
         style={{
           background:
-            "radial-gradient(circle, rgba(74,222,128,0.07) 0%, transparent 70%)",
+            "radial-gradient(circle, rgba(34,211,238,0.07) 0%, transparent 70%)",
         }}
       />
 
@@ -78,7 +78,7 @@ export default function OnboardingPage() {
         <span className="text-2xl">🌿</span>
         <span
           className="text-xl font-bold tracking-tight"
-          style={{ color: "#4ade80" }}
+          style={{ color: "#22D3EE" }}
         >
           VYUM
         </span>
@@ -88,20 +88,20 @@ export default function OnboardingPage() {
       <div
         className="relative z-10 w-full max-w-md rounded-2xl p-8 shadow-2xl"
         style={{
-          background: "#192512",
-          border: "1px solid rgba(74,222,128,0.12)",
+          background: "#0f1929",
+          border: "1px solid rgba(34,211,238,0.12)",
         }}
       >
         {/* Header */}
         <div className="mb-8">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-            style={{ background: "rgba(74,222,128,0.1)" }}
+            style={{ background: "rgba(34,211,238,0.1)" }}
           >
             <span className="text-xl">👋</span>
           </div>
           <h1 className="text-2xl font-bold text-white">Welcome aboard!</h1>
-          <p className="mt-2 text-sm leading-relaxed" style={{ color: "rgba(187,240,166,0.5)" }}>
+          <p className="mt-2 text-sm leading-relaxed" style={{ color: "rgba(186,230,255,0.5)" }}>
             One last step — pick a username so others can find you.
           </p>
         </div>
@@ -113,7 +113,7 @@ export default function OnboardingPage() {
             <label
               htmlFor="username"
               className="text-sm font-medium"
-              style={{ color: "#7ba86a" }}
+              style={{ color: "#60a5fa" }}
             >
               Username
             </label>
@@ -122,7 +122,7 @@ export default function OnboardingPage() {
               {/* @ prefix */}
               <span
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-mono select-none"
-                style={{ color: "rgba(74,222,128,0.45)" }}
+                style={{ color: "rgba(34,211,238,0.45)" }}
               >
                 @
               </span>
@@ -132,13 +132,13 @@ export default function OnboardingPage() {
                 type="text"
                 className="w-full rounded-lg pl-8 pr-16 py-3 text-sm outline-none transition-colors"
                 style={{
-                  background: "#1f2d1c",
+                  background: "#132033",
                   border: `1px solid ${
                     error
                       ? "rgba(248,113,113,0.45)"
-                      : "rgba(74,222,128,0.15)"
+                      : "rgba(34,211,238,0.15)"
                   }`,
-                  color: "#d4edbb",
+                  color: "#bfdbfe",
                   fontFamily: "ui-monospace, monospace",
                 }}
                 placeholder="cool_creator_42"
@@ -161,17 +161,17 @@ export default function OnboardingPage() {
                 style={{
                   color:
                     charCount === 0
-                      ? "rgba(187,240,166,0.2)"
+                      ? "rgba(186,230,255,0.2)"
                       : isValid
-                      ? "#4ade80"
-                      : "rgba(187,240,166,0.35)",
+                      ? "#22D3EE"
+                      : "rgba(186,230,255,0.35)",
                 }}
               >
                 {charCount}/20
               </span>
             </div>
 
-            <p className="text-xs" style={{ color: "rgba(187,240,166,0.3)" }}>
+            <p className="text-xs" style={{ color: "rgba(186,230,255,0.3)" }}>
               3–20 characters · letters, numbers, and underscores only
             </p>
           </div>
@@ -210,9 +210,9 @@ export default function OnboardingPage() {
             className="w-full py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all"
             style={{
               background:
-                loading || !isValid ? "rgba(74,222,128,0.15)" : "#4ade80",
+                loading || !isValid ? "rgba(34,211,238,0.15)" : "#22D3EE",
               color:
-                loading || !isValid ? "rgba(74,222,128,0.35)" : "#052e16",
+                loading || !isValid ? "rgba(34,211,238,0.35)" : "#0B1220",
               cursor: loading || !isValid ? "not-allowed" : "pointer",
             }}
           >
