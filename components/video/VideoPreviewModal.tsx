@@ -4,7 +4,7 @@ import { Video } from "@/types";
 import Button from "@/components/ui/Button";
 
 interface VideoPreviewModalProps {
-  dialogRef: React.RefObject<HTMLDialogElement>;
+  dialogRef: React.RefObject<HTMLDialogElement | null>;
   video: Video;
   videoUrl: string;
   onEdit: () => void;
