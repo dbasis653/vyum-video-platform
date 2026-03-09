@@ -30,6 +30,36 @@ async function resolveDbUser(clerkUserId: string) {
   return prisma.user.findUnique({ where: { clerkId: clerkUserId } });
 }
 
+// ─── GET ──────────────────────────────────────────────────────────────────────
+
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  try {
+    const image = await prisma.image.findUnique({ where: { id } });
+    if (!image) {
+      return NextResponse.json({ error: "Image not found" }, { status: 404 });
+    }
+
+    const dbUser = await resolveDbUser(userId);
+    if (!dbUser || image.userId !== dbUser.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    return NextResponse.json(image);
+  } catch {
+    return NextResponse.json({ error: "Failed to fetch image" }, { status: 500 });
+  }
+}
+
 // ─── PATCH ────────────────────────────────────────────────────────────────────
 
 export async function PATCH(

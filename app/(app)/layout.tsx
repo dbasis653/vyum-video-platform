@@ -12,6 +12,7 @@ import {
   UploadIcon,
   ImageIcon,
 } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 const sidebarItems = [
   { href: "/home", icon: LayoutDashboardIcon, label: "Home" },
@@ -115,7 +116,7 @@ export default function AppLayout({
                   </div>
                   <button
                     onClick={handleSignOut}
-                    className="btn btn-ghost btn-circle btn-sm"
+                    className="btn btn-ghost btn-circle btn-sm transition-all duration-150 hover:brightness-125 hover:scale-110 active:scale-90"
                     title="Sign out"
                     style={{ color: "rgba(248,113,113,0.55)" }}
                   >
@@ -172,7 +173,7 @@ export default function AppLayout({
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-mono tracking-wide"
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-150 text-sm font-mono tracking-wide select-none hover:translate-x-0.5 hover:brightness-110 active:scale-[0.98] active:brightness-90"
                     style={{
                       background: active
                         ? "rgba(34,211,238,0.1)"
@@ -198,17 +199,21 @@ export default function AppLayout({
               className="p-3"
               style={{ borderTop: "1px solid rgba(34,211,238,0.08)" }}
             >
-              <button
+              <Button
+                variant="danger"
+                size="sm"
                 onClick={handleSignOut}
-                className="flex items-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-mono transition-all"
+                className="w-full"
                 style={{
                   color: "rgba(248,113,113,0.6)",
                   border: "1px solid rgba(248,113,113,0.14)",
+                  background: "transparent",
+                  justifyContent: "flex-start",
                 }}
               >
                 <LogOutIcon size={14} />
                 Sign Out
-              </button>
+              </Button>
             </div>
           )}
         </aside>

@@ -3,6 +3,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CldImage } from "next-cloudinary";
 import { UploadIcon, DownloadIcon } from "lucide-react";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Button from "@/components/ui/Button";
+import Spinner from "@/components/ui/Spinner";
 
 const socialFormats = {
   "Instagram Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
@@ -83,14 +86,7 @@ export default function ImageUpload() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      {/* HUD page header */}
-      <div className="flex items-center gap-3 mb-7">
-        <div className="w-0.5 h-4 rounded-full" style={{ background: "#3B82F6" }} />
-        <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "#22D3EE" }}>
-          Image Upload
-        </span>
-        <div className="flex-1 h-px" style={{ background: "rgba(34,211,238,0.1)" }} />
-      </div>
+      <SectionHeader label="Image Upload" />
 
       {/* Upload card */}
       <div
@@ -139,23 +135,18 @@ export default function ImageUpload() {
           </div>
 
           {/* Upload button */}
-          <button
+          <Button
             type="button"
+            variant="primary"
+            size="md"
             onClick={handleFileUpload}
-            disabled={isUploading || !selectedFile}
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-sm font-semibold transition-all"
-            style={{
-              background: isUploading || !selectedFile ? "rgba(34,211,238,0.15)" : "#22D3EE",
-              color: isUploading || !selectedFile ? "rgba(34,211,238,0.4)" : "#0B1220",
-              cursor: isUploading || !selectedFile ? "not-allowed" : "pointer",
-            }}
+            loading={isUploading}
+            disabled={!selectedFile}
+            className="w-full font-semibold"
           >
             {isUploading ? (
               <>
-                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
+                <Spinner className="w-4 h-4" />
                 Uploading…
               </>
             ) : (
@@ -164,7 +155,7 @@ export default function ImageUpload() {
                 Upload Image
               </>
             )}
-          </button>
+          </Button>
 
           {isUploading && <progress className="progress progress-primary w-full" />}
         </div>
@@ -179,14 +170,7 @@ export default function ImageUpload() {
             border: "1px solid rgba(34,211,238,0.12)",
           }}
         >
-          {/* Format selector */}
-          <div className="flex items-center gap-3 mb-5">
-            <div className="w-0.5 h-4 rounded-full" style={{ background: "#3B82F6" }} />
-            <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "#22D3EE" }}>
-              Social Format
-            </span>
-            <div className="flex-1 h-px" style={{ background: "rgba(34,211,238,0.1)" }} />
-          </div>
+          <SectionHeader label="Social Format" className="mb-5" />
 
           <select
             className="select select-bordered w-full mb-6"
@@ -200,14 +184,7 @@ export default function ImageUpload() {
             ))}
           </select>
 
-          {/* Preview */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-0.5 h-4 rounded-full" style={{ background: "#3B82F6" }} />
-            <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "#22D3EE" }}>
-              Preview
-            </span>
-            <div className="flex-1 h-px" style={{ background: "rgba(34,211,238,0.1)" }} />
-          </div>
+          <SectionHeader label="Preview" className="mb-4" />
 
           <div
             className="relative flex justify-center rounded-xl overflow-hidden"
@@ -218,10 +195,7 @@ export default function ImageUpload() {
                 className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10"
                 style={{ background: "rgba(11,18,32,0.75)" }}
               >
-                <svg className="animate-spin w-7 h-7" fill="none" viewBox="0 0 24 24" style={{ color: "#22D3EE" }}>
-                  <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
+                <Spinner className="w-7 h-7" style={{ color: "#22D3EE" }} />
                 <span className="text-xs font-mono" style={{ color: "rgba(34,211,238,0.5)" }}>Transforming…</span>
               </div>
             )}
@@ -241,14 +215,10 @@ export default function ImageUpload() {
 
           {/* Download */}
           <div className="flex justify-end mt-5">
-            <button
-              className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all"
-              style={{ background: "#3B82F6", color: "#0B1220" }}
-              onClick={handleDownload}
-            >
+            <Button variant="blue" size="md" onClick={handleDownload} className="font-semibold">
               <DownloadIcon size={15} />
               Download for {selectedFormat}
-            </button>
+            </Button>
           </div>
         </div>
       )}

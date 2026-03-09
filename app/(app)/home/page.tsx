@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Link from "next/link";
-import VideoCard from "@/components/VideoCard";
-import ImageCard from "@/components/ImageCard";
+import VideoCard from "@/components/video/VideoCard";
+import ImageCard from "@/components/image/ImageCard";
 import { Video, ImageItem } from "@/types";
 import { VideoIcon, ImageIcon } from "lucide-react";
 
