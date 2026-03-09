@@ -22,7 +22,20 @@
       "Bash(__NEW_LINE_5fd7560256f72751__ echo \"=== Blue solid buttons \\(#3B82F6\\) ===\")",
       "Bash(__NEW_LINE_5fd7560256f72751__ echo \"\")",
       "Bash(__NEW_LINE_2f69d73a4cd67a1a__ echo \"\")",
-      "Bash(node recolor.mjs)"
+      "Bash(node recolor.mjs)",
+      "Bash(ls -la \"app/\\(app\\)/home/\")",
+      "Bash(xargs ls -la)",
+      "Bash(ls -la \"app/\\(auth\\)/\")",
+      "Bash(ls -la \"app/\\(app\\)/video-upload/\")",
+      "Bash(ls -la \"app/\\(app\\)/image-upload/\")",
+      "Bash(cat \"app/\\(auth\\)/layout.tsx\")",
+      "Bash(ls -la \"app/\\(app\\)/all-videos/\")",
+      "Bash(ls -la \"app/\\(app\\)/all-images/\")",
+      "Bash(ls -la \"app/\\(app\\)/social-share/\")",
+      "Bash(npm install react-image-crop)",
+      "WebSearch",
+      "Bash(ls -la \"c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\\\(app\\)\\\\crop\\\\\")",
+      "Bash(find \"c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\\\(app\\)\\\\crop\" -type f)"
     ]
   }
 }

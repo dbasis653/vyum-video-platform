@@ -98,14 +98,14 @@ export default function HeroSection() {
         <div className="flex gap-4">
           <Link
             href="/sign-in"
-            className="px-9 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase transition-opacity hover:opacity-85"
+            className="px-9 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase select-none transition-all duration-150 ease-out hover:brightness-110 hover:scale-[1.04] hover:-translate-y-px active:scale-[0.97] active:brightness-90"
             style={{ background: "#3B82F6", color: "#0B1220" }}
           >
             Sign In
           </Link>
           <Link
             href="/sign-up"
-            className="px-9 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase transition-colors hover:border-blue-400/50"
+            className="px-9 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase select-none transition-all duration-150 ease-out hover:brightness-110 hover:scale-[1.04] hover:-translate-y-px active:scale-[0.97] active:brightness-90"
             style={{
               border: "1px solid rgba(34,211,238,0.28)",
               color: "#22D3EE",

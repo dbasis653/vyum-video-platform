@@ -6,6 +6,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { UploadIcon } from "lucide-react";
+import SectionHeader from "@/components/ui/SectionHeader";
+import Button from "@/components/ui/Button";
 
 function VideoUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -61,14 +63,7 @@ function VideoUpload() {
 
   return (
     <div className="max-w-xl mx-auto">
-      {/* HUD page header */}
-      <div className="flex items-center gap-3 mb-7">
-        <div className="w-0.5 h-4 rounded-full" style={{ background: "#3B82F6" }} />
-        <span className="text-xs font-mono tracking-widest uppercase" style={{ color: "#22D3EE" }}>
-          Video Upload
-        </span>
-        <div className="flex-1 h-px" style={{ background: "rgba(34,211,238,0.1)" }} />
-      </div>
+      <SectionHeader label="Video Upload" />
 
       {/* Form card */}
       <div
@@ -144,15 +139,12 @@ function VideoUpload() {
           </div>
 
           {/* Submit */}
-          <button
+          <Button
             type="submit"
-            disabled={isUploading}
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-sm font-semibold transition-all"
-            style={{
-              background: isUploading ? "rgba(34,211,238,0.15)" : "#22D3EE",
-              color: isUploading ? "rgba(34,211,238,0.4)" : "#0B1220",
-              cursor: isUploading ? "not-allowed" : "pointer",
-            }}
+            variant="primary"
+            size="md"
+            loading={isUploading}
+            className="w-full font-semibold"
           >
             {isUploading ? (
               <>
@@ -168,7 +160,7 @@ function VideoUpload() {
                 Upload Video
               </>
             )}
-          </button>
+          </Button>
         </form>
 
         {/* Success banner */}
