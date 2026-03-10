@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BG Remove Feature — Implementation Documentation</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #f7f9fc;
+        color: #1a202c;
+        line-height: 1.7;
+        font-size: 14px;
+      }
+
+      .page {
+        max-width: 820px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 32px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+
+      /* ── Cover ── */
+      .cover {
+        background: linear-gradient(
+          135deg,
+          #0f1929 0%,
+          #0d2035 60%,
+          #0a1a2e 100%
+        );
+        padding: 56px 52px 48px;
+        position: relative;
+        overflow: hidden;
+      }
+      .cover::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          circle,
+          rgba(34, 211, 238, 0.06) 1px,
+          transparent 1px
+        );
+        background-size: 20px 20px;
+      }
+      .cover-tag {
+        display: inline-block;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(34, 211, 238, 0.65);
+        background: rgba(34, 211, 238, 0.08);
+        border: 1px solid rgba(34, 211, 238, 0.2);
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-bottom: 20px;
+        position: relative;
+      }
+      .cover h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #e2f0ff;
+        line-height: 1.25;
+        position: relative;
+        margin-bottom: 12px;
+      }
+      .cover h1 span {
+        color: #22d3ee;
+      }
+      .cover-sub {
+        font-size: 13.5px;
+        color: rgba(186, 230, 255, 0.55);
+        position: relative;
+        max-width: 520px;
+      }
+      .cover-meta {
+        display: flex;
+        gap: 24px;
+        margin-top: 36px;
+        position: relative;
+      }
+      .cover-meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .cover-meta-item .label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: rgba(34, 211, 238, 0.4);
+      }
+      .cover-meta-item .value {
+        font-size: 12px;
+        color: rgba(186, 230, 255, 0.75);
+      }
+
+      /* ── Body ── */
+      .body {
+        padding: 48px 52px;
+      }
+
+      /* ── Section headings ── */
+      h2 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f1929;
+        margin-top: 44px;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e8f4ff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      h2::before {
+        content: "";
+        display: inline-block;
+        width: 4px;
+        height: 20px;
+        background: #22d3ee;
+        border-radius: 2px;
+      }
+      h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a202c;
+        margin-top: 28px;
+        margin-bottom: 10px;
+      }
+      h4 {
+        font-size: 13px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-top: 18px;
+        margin-bottom: 8px;
+      }
+
+      p {
+        margin-bottom: 12px;
+        color: #2d3748;
+      }
+
+      /* ── Tables ── */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 16px 0 24px;
+        font-size: 13px;
+      }
+      thead tr {
+        background: #f0f8ff;
+      }
+      th {
+        text-align: left;
+        padding: 9px 14px;
+        font-weight: 600;
+        color: #0f1929;
+        border-bottom: 2px solid #dbeafe;
+      }
+      td {
+        padding: 8px 14px;
+        border-bottom: 1px solid #f0f4f8;
+        color: #374151;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: #f8fbff;
+      }
+
+      /* ── Code blocks ── */
+      pre {
+        background: #0f1929;
+        border: 1px solid rgba(34, 211, 238, 0.12);
+        border-radius: 8px;
+        padding: 16px 20px;
+        overflow-x: auto;
+        margin: 12px 0 20px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        line-height: 1.65;
+        color: #bfdbfe;
+      }
+      code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        background: #eef6ff;
+        color: #0e6dac;
+        padding: 1px 6px;
+        border-radius: 4px;
+      }
+      pre code {
+        background: none;
+        color: inherit;
+        padding: 0;
+        font-size: inherit;
+      }
+      .comment {
+        color: rgba(34, 211, 238, 0.45);
+      }
+      .keyword {
+        color: #93c5fd;
+      }
+      .string {
+        color: #86efac;
+      }
+      .fn {
+        color: #fde68a;
+      }
+
+      /* ── Hurdle boxes ── */
+      .hurdle {
+        background: #fff8f0;
+        border-left: 4px solid #f59e0b;
+        border-radius: 0 8px 8px 0;
+        padding: 14px 18px;
+        margin: 16px 0;
+      }
+      .hurdle .hurdle-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: #d97706;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .hurdle p {
+        color: #78350f;
+        margin: 0;
+        font-size: 13px;
+      }
+
+      .fix {
+        background: #f0fdf4;
+        border-left: 4px solid #22c55e;
+        border-radius: 0 8px 8px 0;
+        padding: 14px 18px;
+        margin: 16px 0;
+      }
+      .fix .fix-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: #16a34a;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .fix p {
+        color: #14532d;
+        margin: 0;
+        font-size: 13px;
+      }
+
+      /* ── Flow diagram ── */
+      .flow {
+        background: #0f1929;
+        border: 1px solid rgba(34, 211, 238, 0.12);
+        border-radius: 10px;
+        padding: 24px 28px;
+        margin: 16px 0 24px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        color: #bfdbfe;
+        line-height: 1.9;
+        white-space: pre;
+      }
+
+      /* ── Save modes table ── */
+      .save-mode {
+        display: inline-block;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: rgba(34, 211, 238, 0.08);
+        border: 1px solid rgba(34, 211, 238, 0.2);
+        color: #0e7490;
+      }
+
+      /* ── Step number badge ── */
+      .step-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 36px;
+        margin-bottom: 12px;
+      }
+      .step-num {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #0f1929;
+        color: #22d3ee;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .step-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f1929;
+      }
+      .step-file {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: #64748b;
+      }
+
+      /* ── List ── */
+      ul {
+        padding-left: 20px;
+        margin-bottom: 14px;
+      }
+      ul li {
+        margin-bottom: 6px;
+        color: #374151;
+      }
+
+      /* ── Divider ── */
+      hr {
+        border: none;
+        border-top: 1px solid #e8f4ff;
+        margin: 36px 0;
+      }
+
+      /* ── Print ── */
+      @media print {
+        body {
+          background: #fff;
+        }
+        .page {
+          box-shadow: none;
+          margin: 0;
+          border-radius: 0;
+        }
+        h2 {
+          page-break-after: avoid;
+        }
+        .step-header {
+          page-break-after: avoid;
+        }
+        pre {
+          page-break-inside: avoid;
+        }
+        .hurdle,
+        .fix {
+          page-break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- Cover -->
+      <div class="cover">
+        <div class="cover-tag">Feature Documentation</div>
+        <h1>AI <span>Background Removal</span><br />Feature</h1>
+        <p class="cover-sub">
+          Complete implementation guide for the BG Remove tool built on top of
+          Cloudinary AI, integrated into the VYUM Playground.
+        </p>
+        <div class="cover-meta">
+          <div class="cover-meta-item">
+            <span class="label">Project</span>
+            <span class="value">VYUM Resizer</span>
+          </div>
+          <div class="cover-meta-item">
+            <span class="label">Branch</span>
+            <span class="value">feature/image-bg-remove</span>
+          </div>
+          <div class="cover-meta-item">
+            <span class="label">Stack</span>
+            <span class="value">Next.js 16 · Cloudinary · Prisma · Clerk</span>
+          </div>
+          <div class="cover-meta-item">
+            <span class="label">Date</span>
+            <span class="value">March 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="body">
+        <!-- Overview -->
+        <h2>Overview</h2>
+        <p>
+          The BG Remove feature lets users remove the background from any
+          uploaded image using Cloudinary's AI transformation engine. Users can
+          preview the result, then choose to save it as a new copy, overwrite
+          the original, or download it directly. The feature lives inside the
+          <strong>Playground</strong> — a multi-tool page that hosts image
+          editing tools under a shared tab bar.
+        </p>
+
+        <!-- Files Changed -->
+        <h2>Files Created &amp; Modified</h2>
+
+        <h3>New Files</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>app/api/image-bg-remove/route.ts</code></td>
+              <td>Backend — Cloudinary BG removal + polling + save logic</td>
+            </tr>
+            <tr>
+              <td>
+                <code
+                  >components/playground/features/bg-remove/BgRemoveTool.tsx</code
+                >
+              </td>
+              <td>
+                UI component — options, side-by-side preview, action buttons
+              </td>
+            </tr>
+            <tr>
+              <td><code>lib/cloudinary.ts</code></td>
+              <td>Shared Cloudinary singleton (extracted from inline usage)</td>
+            </tr>
+            <tr>
+              <td><code>lib/constants/bgRemove.ts</code></td>
+              <td>Cloudinary effect strings, folder name, BgOutput type</td>
+            </tr>
+            <tr>
+              <td><code>lib/constants/playgroundTools.ts</code></td>
+              <td>Tab definitions (TOOLS array + ToolId type)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Modified Files</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>app/(app)/playground/[id]/page.tsx</code></td>
+              <td>Refactored to tab-based architecture, added BG Remove tab</td>
+            </tr>
+            <tr>
+              <td><code>app/api/image-upload/route.ts</code></td>
+              <td>
+                Use Cloudinary singleton; now returns
+                <code>{ id, publicId }</code>
+              </td>
+            </tr>
+            <tr>
+              <td><code>app/api/image-crop/route.ts</code></td>
+              <td>Refactored to use shared Cloudinary singleton</td>
+            </tr>
+            <tr>
+              <td><code>app/api/video-upload/route.ts</code></td>
+              <td>Refactored to use shared Cloudinary singleton</td>
+            </tr>
+            <tr>
+              <td><code>components/image/ImagePreviewModal.tsx</code></td>
+              <td>Added BG Remove + Playground shortcut buttons</td>
+            </tr>
+            <tr>
+              <td><code>components/image/ImageCard.tsx</code></td>
+              <td>Minor UI additions</td>
+            </tr>
+            <tr>
+              <td><code>app/(app)/image-upload/page.tsx</code></td>
+              <td>
+                After upload → navigate to Playground (not inline preview)
+              </td>
+            </tr>
+            <tr>
+              <td><code>app/(app)/social-share/page.tsx</code></td>
+              <td>
+                <strong>Deleted</strong> — functionality folded into Playground
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <hr />
+
+        <!-- Step by Step -->
+        <h2>Step-by-Step Implementation</h2>
+
+        <!-- Step 1 -->
+        <div class="step-header">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-title">Shared Cloudinary Singleton</div>
+            <div class="step-file">lib/cloudinary.ts</div>
+          </div>
+        </div>
+        <p>
+          Before this feature, every API route (<code>image-upload</code>,
+          <code>video-upload</code>, <code>image-crop</code>) was calling
+          <code>cloudinary.config(...)</code> inline with credentials repeated
+          in every file. Adding a fourth route (<code>image-bg-remove</code>)
+          would have made it a fifth copy.
+        </p>
+        <div class="hurdle">
+          <div class="hurdle-label">Problem</div>
+          <p>
+            Cloudinary credentials and <code>config()</code> call duplicated
+            across every API route file — violates DRY and CLAUDE.md
+            shared-singleton rule.
+          </p>
+        </div>
+        <div class="fix">
+          <div class="fix-label">Fix</div>
+          <p>
+            Extracted a single <code>lib/cloudinary.ts</code> that calls
+            <code>cloudinary.config()</code> once and exports the instance. All
+            routes now import from this singleton.
+          </p>
+        </div>
+        <pre><code><span class="comment">// lib/cloudinary.ts</span>
+<span class="keyword">import</span> { v2 as cloudinary } <span class="keyword">from</span> <span class="string">"cloudinary"</span>;
+
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+<span class="keyword">export default</span> cloudinary;</code></pre>
+
+        <!-- Step 2 -->
+        <div class="step-header">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-title">Constants</div>
+            <div class="step-file">
+              lib/constants/bgRemove.ts · lib/constants/playgroundTools.ts
+            </div>
+          </div>
+        </div>
+        <p>
+          Per CLAUDE.md rules, any constant with reuse potential must live in
+          <code>lib/constants/</code>
+          and never be defined inline in a component or route.
+        </p>
+        <h4>bgRemove.ts — exports</h4>
+        <ul>
+          <li>
+            <code>BG_REMOVE_EFFECT</code> = <code>"background_removal"</code> —
+            standard Cloudinary effect string
+          </li>
+          <li>
+            <code>BG_REMOVE_FINE_EDGES_EFFECT</code> =
+            <code>"background_removal:fineedges_y"</code> — for fur, feathers,
+            fine edge detail
+          </li>
+          <li>
+            <code>BG_REMOVE_FOLDER</code> = <code>"images"</code> — Cloudinary
+            folder for saved copies
+          </li>
+          <li>
+            <code>BgOutput</code> type = <code>"transparent" | "white"</code>
+          </li>
+        </ul>
+        <h4>playgroundTools.ts — exports</h4>
+        <ul>
+          <li>
+            <code>TOOLS</code> array — drives the tab bar; adding a new tool
+            here auto-adds its tab without touching the page JSX
+          </li>
+          <li>
+            <code>ToolId</code> union type — <code>"crop" | "bg-remove"</code>
+          </li>
+        </ul>
+
+        <!-- Step 3 -->
+        <div class="step-header">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-title">Backend API — Background Removal</div>
+            <div class="step-file">app/api/image-bg-remove/route.ts</div>
+          </div>
+        </div>
+        <p>
+          This was the most complex part of the feature. The route handles three
+          save modes and had two major technical hurdles.
+        </p>
+
+        <h4>Hurdle 1 — Cloudinary async transformation</h4>
+        <div class="hurdle">
+          <div class="hurdle-label">Problem</div>
+          <p>
+            Cloudinary's <code>e_background_removal</code> is
+            <strong>asynchronous</strong>. When you build an on-the-fly
+            transformation URL and immediately pass it to
+            <code>cloudinary.uploader.upload()</code> as a source, Cloudinary
+            returns a <strong>400 error</strong> because the transformation
+            hasn't been processed yet.
+          </p>
+        </div>
+        <div class="fix">
+          <div class="fix-label">Fix — Server-side polling</div>
+          <p>
+            Build the on-the-fly URL → poll it with GET requests every 2 seconds
+            until Cloudinary returns 200 (cached and ready) → only then pass it
+            to <code>uploader.upload()</code>. Cloudinary returns 423 while
+            still processing.
+          </p>
+        </div>
+        <p>
+          <strong>Why GET and not HEAD:</strong> HEAD requests do not trigger
+          Cloudinary's on-the-fly processing pipeline. Only a full GET request
+          wakes it up.
+        </p>
+        <pre><code><span class="comment">// Polls every 2s, up to 20 tries (~40s max)</span>
+<span class="keyword">async function</span> <span class="fn">waitForReady</span>(url: string): Promise&lt;void&gt; {
+  <span class="keyword">for</span> (let i = 0; i &lt; 20; i++) {
+    <span class="keyword">const</span> res = <span class="keyword">await</span> fetch(url, { method: <span class="string">"GET"</span> });
+    <span class="keyword">if</span> (res.ok) <span class="keyword">return</span>;                 <span class="comment">// 200 — cached, ready</span>
+    <span class="keyword">if</span> (res.status !== 423) <span class="keyword">throw new</span> Error(...); <span class="comment">// unexpected error</span>
+    <span class="keyword">await new</span> Promise((r) =&gt; setTimeout(r, 2000)); <span class="comment">// 423 — still processing</span>
+  }
+  <span class="keyword">throw new</span> Error(<span class="string">"Background removal timed out after 40s"</span>);
+}</code></pre>
+
+        <h4>Hurdle 2 — PNG transparency / format issue</h4>
+        <div class="hurdle">
+          <div class="hurdle-label">Problem</div>
+          <p>
+            Cloudinary BG removal produces transparent areas, but the default
+            output format follows the source image (often JPG). JPG does not
+            support alpha transparency — so transparent areas came out
+            <strong>solid black</strong>.
+          </p>
+        </div>
+        <div class="fix">
+          <div class="fix-label">
+            Fix — Separate transformation steps in the URL
+          </div>
+          <p>
+            Chain <code>f_png</code> as a
+            <strong>separate step</strong> (slash-separated in the URL), NOT
+            combined with <code>e_background_removal</code> in the same step.
+            Combining them in one step causes a 400 error.
+          </p>
+        </div>
+        <pre><code><span class="comment">// ✗ Wrong — 400 error</span>
+/e_background_removal,f_png/{publicId}
+
+<span class="comment">// ✓ Correct — separate steps</span>
+/e_background_removal/f_png/{publicId}
+
+<span class="comment">// White BG mode — fills transparency instead of forcing PNG</span>
+/e_background_removal/b_white/{publicId}</code></pre>
+
+        <h4>Three Save Modes</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>saveMode</th>
+              <th>What happens</th>
+              <th>DB change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="save-mode">preview</span></td>
+              <td>Polls until ready, returns cached URL. No upload.</td>
+              <td>None</td>
+            </tr>
+            <tr>
+              <td><span class="save-mode">copy</span></td>
+              <td>
+                Polls, uploads to Cloudinary as a new asset in
+                <code>images/</code> folder.
+              </td>
+              <td>New <code>Image</code> row created</td>
+            </tr>
+            <tr>
+              <td><span class="save-mode">overwrite</span></td>
+              <td>
+                Polls, re-uploads with same <code>public_id</code> +
+                <code>invalidate: true</code> to clear CDN cache.
+              </td>
+              <td>Existing row updated (width/height)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Step 4 -->
+        <div class="step-header">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-title">UI Component — BgRemoveTool</div>
+            <div class="step-file">
+              components/playground/features/bg-remove/BgRemoveTool.tsx
+            </div>
+          </div>
+        </div>
+        <p>Side-by-side layout (Original | Result) with:</p>
+        <ul>
+          <li>
+            <strong>Transparent / White BG</strong> toggle — switches the output
+            mode. Changing it resets the result (stale result no longer
+            matches).
+          </li>
+          <li>
+            <strong>Fine Edges</strong> checkbox — enables
+            <code>fineedges_y</code> effect for images with fur, feathers, or
+            intricate edge detail.
+          </li>
+          <li>
+            <strong>Animated processing skeleton</strong> — scanning line,
+            spinning rings, pulsing corner brackets shown during the API poll.
+          </li>
+          <li>
+            <strong>Checkerboard background</strong> on the result panel — only
+            in Transparent mode to reveal alpha areas. White mode uses a plain
+            dark background.
+          </li>
+          <li>
+            <strong>Three action buttons</strong> (Save as Copy, Override
+            Original, Download) — disabled until a preview result exists.
+          </li>
+        </ul>
+
+        <!-- Step 5 -->
+        <div class="step-header">
+          <div class="step-num">5</div>
+          <div>
+            <div class="step-title">Playground Page Refactor</div>
+            <div class="step-file">app/(app)/playground/[id]/page.tsx</div>
+          </div>
+        </div>
+        <p>
+          The playground previously only had the Crop tool. We refactored it
+          into a tab-based host:
+        </p>
+        <ul>
+          <li>
+            <code>TOOLS</code> constant drives the tab bar — adding a new tool
+            to the constant auto-adds its tab without any JSX changes.
+          </li>
+          <li>
+            Reads <code>?tool=</code> query param on load, so external buttons
+            (e.g. "BG Remove" in the Image Preview Modal) can pre-select a tool
+            on arrival.
+          </li>
+          <li>
+            <code>activeTool</code> state switches between
+            <code>&lt;CropTool&gt;</code> and <code>&lt;BgRemoveTool&gt;</code>.
+          </li>
+          <li>
+            Skeleton loader shown while the image is being fetched from the DB.
+          </li>
+        </ul>
+
+        <!-- Step 6 -->
+        <div class="step-header">
+          <div class="step-num">6</div>
+          <div>
+            <div class="step-title">Image Upload Page — Navigation Change</div>
+            <div class="step-file">app/(app)/image-upload/page.tsx</div>
+          </div>
+        </div>
+        <div class="hurdle">
+          <div class="hurdle-label">Problem</div>
+          <p>
+            After upload, the API returned <code>{ publicId }</code> (the
+            Cloudinary public_id, e.g. <code>images/abc123</code>). The page
+            navigated to <code>/playground/images%2Fabc123</code>. But the
+            playground calls <code>GET /api/images/{id}</code> which does
+            <code>prisma.image.findUnique({ where: { id } })</code> — expecting
+            a <strong>database UUID</strong>, not a Cloudinary public_id.
+            Result: <strong>"Failed to load image."</strong>
+          </p>
+        </div>
+        <div class="fix">
+          <div class="fix-label">Fix</div>
+          <p>
+            Changed <code>await prisma.image.create()</code> to
+            <code>const image = await prisma.image.create()</code> and returned
+            <code>{ id: image.id, publicId }</code>. The page now navigates to
+            <code>/playground/${data.id}</code> — a clean UUID, URL-safe with no
+            encoding needed.
+          </p>
+        </div>
+
+        <!-- Step 7 -->
+        <div class="step-header">
+          <div class="step-num">7</div>
+          <div>
+            <div class="step-title">Image Preview Modal — Shortcuts</div>
+            <div class="step-file">components/image/ImagePreviewModal.tsx</div>
+          </div>
+        </div>
+        <p>
+          Added <strong>BG Remove</strong> and
+          <strong>Playground</strong> shortcut buttons alongside the existing
+          Crop button. Each closes the modal and calls
+          <code>router.push</code> with the appropriate
+          <code>?tool=</code> param so the playground lands on the right tab
+          immediately.
+        </p>
+
+        <hr />
+
+        <!-- Final Data Flow -->
+        <h2>Final Data Flow</h2>
+        <div class="flow">
+          User uploads image └─ POST /api/image-upload ├─ Upload to Cloudinary →
+          gets publicId ├─ Save to DB → gets UUID (id) └─ Returns { id, publicId
+          } └─ router.push(`/playground/${id}`) Playground page loads └─ GET
+          /api/images/{uuid} └─ Returns ImageItem { id, publicId, title, width,
+          height } User clicks "Remove Background" └─ POST /api/image-bg-remove
+          { imageId, fineEdges, bgOutput, saveMode: "preview" } ├─ Build
+          on-the-fly URL: │ https://res.cloudinary.com/{cloud}/image/upload │
+          /e_background_removal/f_png/{publicId} ├─ Poll with GET every 2s until
+          200 │ (Cloudinary returns 423 while processing) └─ Return { url } →
+          shown in result panel User clicks "Save as Copy" └─ POST
+          /api/image-bg-remove { saveMode: "copy" } ├─ waitForReady(url) ←
+          already cached, returns immediately ├─ cloudinary.uploader.upload(url,
+          { folder: "images" }) └─ prisma.image.create(...) → new DB row →
+          appears in Home
+        </div>
+
+        <hr />
+
+        <!-- Architecture summary -->
+        <h2>Architecture Decisions</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Decision</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Server-side polling instead of client-side</td>
+              <td>
+                Client would need to handle 423 retries and build/know the
+                Cloudinary URL. Server polling keeps all Cloudinary logic
+                backend-only and returns a guaranteed-ready URL to the client.
+              </td>
+            </tr>
+            <tr>
+              <td>Separate URL steps for <code>f_png</code></td>
+              <td>
+                Cloudinary requires transformation steps that depend on the
+                result of a previous step to be slash-separated. Combining them
+                in one step causes a 400.
+              </td>
+            </tr>
+            <tr>
+              <td>Constants in <code>lib/constants/</code></td>
+              <td>
+                CLAUDE.md rule: any constant with reuse potential must be
+                extracted. Keeps route files clean and allows future tools to
+                reference the same effect strings.
+              </td>
+            </tr>
+            <tr>
+              <td>Shared Cloudinary singleton</td>
+              <td>
+                CLAUDE.md rule: third-party SDK configs used in more than one
+                file go in <code>lib/&lt;service&gt;.ts</code>. Prevents
+                credential repetition and config drift.
+              </td>
+            </tr>
+            <tr>
+              <td>TOOLS array drives tab bar</td>
+              <td>
+                Adding a new playground tool only requires one entry in
+                <code>playgroundTools.ts</code> — no JSX changes needed in the
+                page.
+              </td>
+            </tr>
+            <tr>
+              <td><code>?tool=</code> query param</td>
+              <td>
+                Allows external navigation (from modal buttons, links) to
+                pre-select a specific tool without any shared state.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- /body -->
+    </div>
+    <!-- /page -->
+  </body>
+</html>

@@ -1,36 +1,17 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { CldImage } from "next-cloudinary";
-import { UploadIcon, DownloadIcon } from "lucide-react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { UploadIcon } from "lucide-react";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Button from "@/components/ui/Button";
 import Spinner from "@/components/ui/Spinner";
 
-const socialFormats = {
-  "Instagram Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
-  "Instagram Portrait (4:5)": { width: 1080, height: 1350, aspectRatio: "4:5" },
-  "Twitter Post (16:9)": { width: 1200, height: 675, aspectRatio: "16:9" },
-  "Twitter Header (3:1)": { width: 1500, height: 500, aspectRatio: "3:1" },
-  "Facebook Cover (205:78)": { width: 820, height: 312, aspectRatio: "205:78" },
-};
-
-type SocialFormat = keyof typeof socialFormats;
-
 export default function ImageUpload() {
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedFormat, setSelectedFormat] = useState<SocialFormat>(
-    "Instagram Square (1:1)",
-  );
   const [isUploading, setIsUploading] = useState(false);
-  const [isTransforming, setIsTransforming] = useState(false);
-  const imageRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    if (uploadedImage) setIsTransforming(true);
-  }, [uploadedImage, selectedFormat]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
@@ -57,8 +38,9 @@ export default function ImageUpload() {
 
       if (!response.ok) throw new Error("Upload image failed");
 
-      const data: { publicId: string } = await response.json();
-      setUploadedImage(data.publicId);
+      const data: { id: string; publicId: string } = await response.json();
+      // Navigate to the playground using the DB UUID (playground API looks up by UUID, not publicId)
+      router.push(`/playground/${data.id}`);
     } catch (error) {
       console.log("upload failed", error);
       alert("Upload image failed");
@@ -67,22 +49,6 @@ export default function ImageUpload() {
     }
   };
 
-  const handleDownload = () => {
-    if (!imageRef.current) return;
-
-    fetch(imageRef.current.src)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `${selectedFormat.replace(/\s+/g, "-").toLowerCase()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      });
-  };
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -161,67 +127,6 @@ export default function ImageUpload() {
         </div>
       </div>
 
-      {/* Format + preview card */}
-      {uploadedImage && (
-        <div
-          className="rounded-2xl p-6"
-          style={{
-            background: "#0f1929",
-            border: "1px solid rgba(34,211,238,0.12)",
-          }}
-        >
-          <SectionHeader label="Social Format" className="mb-5" />
-
-          <select
-            className="select select-bordered w-full mb-6"
-            value={selectedFormat}
-            onChange={(e) => setSelectedFormat(e.target.value as SocialFormat)}
-          >
-            {Object.keys(socialFormats).map((format) => (
-              <option key={format} value={format}>
-                {format}
-              </option>
-            ))}
-          </select>
-
-          <SectionHeader label="Preview" className="mb-4" />
-
-          <div
-            className="relative flex justify-center rounded-xl overflow-hidden"
-            style={{ background: "#0B1220", border: "1px solid rgba(34,211,238,0.08)" }}
-          >
-            {isTransforming && (
-              <div
-                className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10"
-                style={{ background: "rgba(11,18,32,0.75)" }}
-              >
-                <Spinner className="w-7 h-7" style={{ color: "#22D3EE" }} />
-                <span className="text-xs font-mono" style={{ color: "rgba(34,211,238,0.5)" }}>Transforming…</span>
-              </div>
-            )}
-            <CldImage
-              width={socialFormats[selectedFormat].width}
-              height={socialFormats[selectedFormat].height}
-              src={uploadedImage}
-              sizes="100vw"
-              alt="transformed image"
-              crop="fill"
-              aspectRatio={socialFormats[selectedFormat].aspectRatio}
-              gravity="auto"
-              ref={imageRef}
-              onLoad={() => setIsTransforming(false)}
-            />
-          </div>
-
-          {/* Download */}
-          <div className="flex justify-end mt-5">
-            <Button variant="blue" size="md" onClick={handleDownload} className="font-semibold">
-              <DownloadIcon size={15} />
-              Download for {selectedFormat}
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

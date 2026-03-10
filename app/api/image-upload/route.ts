@@ -14,15 +14,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
+// cloudinary — pre-configured Cloudinary v2 instance (cloud_name, api_key, api_secret loaded from env)
+// Using the shared singleton from lib/cloudinary.ts so config is never repeated across route files.
+import cloudinary from "@/lib/cloudinary";
 import { auth } from "@clerk/nextjs/server";
+// prisma — shared PrismaClient singleton; never instantiate PrismaClient locally in a route.
+// Using a singleton prevents connection pool exhaustion in serverless/Edge environments.
 import { prisma } from "@/lib/prisma";
-
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 interface CloudinaryUploadResult {
   public_id: string;
@@ -77,7 +75,7 @@ export async function POST(request: NextRequest) {
     );
 
     // 4. Store metadata in DB, linking the image to its owner via userId
-    await prisma.image.create({
+    const image = await prisma.image.create({
       data: {
         title: title.trim(),
         publicId: result.public_id,
@@ -87,7 +85,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ publicId: result.public_id }, { status: 200 });
+    // Return both the DB UUID (for playground navigation) and publicId (for Cloudinary ops)
+    return NextResponse.json({ id: image.id, publicId: result.public_id }, { status: 200 });
   } catch (error) {
     console.log("Upload img failed", error);
     return NextResponse.json({ error: "Upload img failed" }, { status: 500 });

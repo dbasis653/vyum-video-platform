@@ -10,15 +10,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
+// cloudinary — pre-configured Cloudinary v2 instance (cloud_name, api_key, api_secret loaded from env)
+// Using the shared singleton from lib/cloudinary.ts so config is never repeated across route files.
+import cloudinary from "@/lib/cloudinary";
 import { auth } from "@clerk/nextjs/server";
+// prisma — shared PrismaClient singleton; never instantiate PrismaClient locally in a route.
+// Using a singleton prevents connection pool exhaustion in serverless/Edge environments.
 import { prisma } from "@/lib/prisma";
-
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 interface CloudinaryUploadResult {
   public_id: string;

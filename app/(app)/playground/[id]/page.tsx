@@ -1,32 +1,32 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import axios from "axios";
-import { Scissors, Wand2 } from "lucide-react";
 import { ImageItem } from "@/types";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ErrorBanner from "@/components/ui/ErrorBanner";
 import CropTool from "@/components/playground/features/crop/CropTool";
-
-// ─── Tool definitions ─────────────────────────────────────────────────────────
-
-type ToolId = "crop" | "bg-remove";
-
-const TOOLS: { id: ToolId; label: string; icon: React.ReactNode; comingSoon?: boolean }[] = [
-  { id: "crop",      label: "Crop",      icon: <Scissors size={13} /> },
-  { id: "bg-remove", label: "BG Remove", icon: <Wand2 size={13} />, comingSoon: true },
-];
+import BgRemoveTool from "@/components/playground/features/bg-remove/BgRemoveTool";
+// TOOLS  — ordered list of playground tools, each with { id, label, icon, comingSoon? }
+//          drives the tab bar rendering — add new tools here to make them appear automatically
+// ToolId — union type ("crop" | "bg-remove" | ...) used to type activeTool state
+//          kept in lib/constants so any future sidebar, nav, or tool-picker component
+//          can reference the same list without duplicating it
+import { TOOLS, ToolId } from "@/lib/constants/playgroundTools";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function PlaygroundPage() {
   const { id } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
 
   const [image, setImage] = useState<ImageItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [activeTool, setActiveTool] = useState<ToolId>("crop");
+  // Read ?tool= from URL so buttons like "BG Remove" in ImagePreviewModal can pre-select a tool
+  const initialTool = (searchParams.get("tool") as ToolId | null) ?? "crop";
+  const [activeTool, setActiveTool] = useState<ToolId>(initialTool);
 
   useEffect(() => {
     axios
@@ -130,6 +130,7 @@ export default function PlaygroundPage() {
 
       {/* ── Active tool ── */}
       {activeTool === "crop" && <CropTool image={image} />}
+      {activeTool === "bg-remove" && <BgRemoveTool image={image} />}
     </div>
   );
 }

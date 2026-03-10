@@ -10,30 +10,19 @@ import { ImageItem } from "@/types";
 import ErrorBanner from "@/components/ui/ErrorBanner";
 import Spinner from "@/components/ui/Spinner";
 import Button from "@/components/ui/Button";
+// PRESETS      — list of crop aspect-ratio presets (Free, Instagram, Twitter, YouTube, etc.)
+//                each entry has: label, aspect ratio, and target output width/height
+// PRESET_SUFFIX — maps a preset label → filename suffix appended when saving a cropped copy
+//                 e.g. "Instagram 1:1" → "_inst_1:1"
+// Kept in lib/constants so any future crop-related component or export tool shares the same definitions.
+import { PRESETS, PRESET_SUFFIX } from "@/lib/constants/cropPresets";
 
-// ─── Presets ──────────────────────────────────────────────────────────────────
-
-const PRESETS = [
-  { label: "Free",             aspect: undefined,      w: undefined,  h: undefined  },
-  { label: "Instagram 1:1",   aspect: 1,              w: 1080,       h: 1080       },
-  { label: "Instagram 4:5",   aspect: 4 / 5,          w: 1080,       h: 1350       },
-  { label: "Twitter Post",    aspect: 16 / 9,         w: 1200,       h: 675        },
-  { label: "Facebook Cover",  aspect: 820 / 312,      w: 820,        h: 312        },
-  { label: "YouTube Cover",   aspect: 2560 / 1440,    w: 2560,       h: 1440       },
-  { label: "YouTube Profile", aspect: 1,              w: 800,        h: 800        },
-];
-
-const PRESET_SUFFIX: Record<string, string> = {
-  "Free":             "_cropped",
-  "Instagram 1:1":   "_inst_1:1",
-  "Instagram 4:5":   "_inst_4:5",
-  "Twitter Post":    "_twitter",
-  "Facebook Cover":  "_fb_cover",
-  "YouTube Cover":   "_yt_cover",
-  "YouTube Profile": "_yt_profile",
-};
-
-function makeCenteredCrop(aspect: number, imgW: number, imgH: number): PixelCrop {
+//It calculates a centered crop box that fits within the image while respecting a given aspect ratio.
+function makeCenteredCrop(
+  aspect: number,
+  imgW: number,
+  imgH: number,
+): PixelCrop {
   let w = imgW;
   let h = w / aspect;
   if (h > imgH) {
@@ -132,8 +121,17 @@ export default function CropTool({ image }: CropToolProps) {
     else setIsSavingOverwrite(true);
 
     try {
-      const copyTitle = image.title + (PRESET_SUFFIX[activePreset] ?? "_cropped");
-      await axios.post("/api/image-crop", { imageId: image.id, x, y, w, h, mode, title: copyTitle });
+      const copyTitle =
+        image.title + (PRESET_SUFFIX[activePreset] ?? "_cropped");
+      await axios.post("/api/image-crop", {
+        imageId: image.id,
+        x,
+        y,
+        w,
+        h,
+        mode,
+        title: copyTitle,
+      });
       const msg =
         mode === "copy"
           ? "Saved as a new copy in your library."
@@ -167,7 +165,8 @@ export default function CropTool({ image }: CropToolProps) {
   };
 
   const busy = isSavingCopy || isSavingOverwrite || isDownloading;
-  const hasCrop = completedCrop && completedCrop.width > 0 && completedCrop.height > 0;
+  const hasCrop =
+    completedCrop && completedCrop.width > 0 && completedCrop.height > 0;
 
   return (
     <div>
@@ -218,11 +217,15 @@ export default function CropTool({ image }: CropToolProps) {
               variant={active ? "cyan" : "ghost"}
               size="xs"
               onClick={() => handlePreset(preset.label, preset.aspect)}
-              style={active ? {
-                background: "rgba(34,211,238,0.18)",
-                border: "1px solid rgba(34,211,238,0.4)",
-                color: "#22D3EE",
-              } : undefined}
+              style={
+                active
+                  ? {
+                      background: "rgba(34,211,238,0.18)",
+                      border: "1px solid rgba(34,211,238,0.4)",
+                      color: "#22D3EE",
+                    }
+                  : undefined
+              }
             >
               {preset.label}
             </Button>
@@ -235,7 +238,10 @@ export default function CropTool({ image }: CropToolProps) {
         {/* Left: crop canvas */}
         <div
           className="rounded-xl overflow-hidden flex items-center justify-center p-4"
-          style={{ background: "#0B1220", border: "1px solid rgba(34,211,238,0.1)" }}
+          style={{
+            background: "#0B1220",
+            border: "1px solid rgba(34,211,238,0.1)",
+          }}
         >
           <ReactCrop
             crop={crop}
@@ -256,7 +262,10 @@ export default function CropTool({ image }: CropToolProps) {
         {/* Right: live preview */}
         <div
           className="rounded-xl overflow-hidden flex flex-col items-center justify-center p-4 gap-3"
-          style={{ background: "#0B1220", border: "1px solid rgba(34,211,238,0.1)" }}
+          style={{
+            background: "#0B1220",
+            border: "1px solid rgba(34,211,238,0.1)",
+          }}
         >
           <span
             className="text-xs font-mono tracking-widest uppercase self-start"
@@ -271,29 +280,35 @@ export default function CropTool({ image }: CropToolProps) {
                   className="relative w-full rounded-xl overflow-hidden flex items-center justify-center"
                   style={{
                     minHeight: "260px",
-                    background: "linear-gradient(145deg, #060d1b 0%, #091525 100%)",
+                    background:
+                      "linear-gradient(145deg, #060d1b 0%, #091525 100%)",
                     animation: "previewFadeIn 0.25s ease-out",
                   }}
                 >
                   <div
                     className="absolute inset-0"
                     style={{
-                      backgroundImage: "radial-gradient(circle, rgba(34,211,238,0.065) 1px, transparent 1px)",
+                      backgroundImage:
+                        "radial-gradient(circle, rgba(34,211,238,0.065) 1px, transparent 1px)",
                       backgroundSize: "18px 18px",
                     }}
                   />
                   <div
                     className="absolute"
                     style={{
-                      width: "200px", height: "200px", borderRadius: "50%",
-                      background: "radial-gradient(circle, rgba(34,211,238,0.09) 0%, transparent 70%)",
+                      width: "200px",
+                      height: "200px",
+                      borderRadius: "50%",
+                      background:
+                        "radial-gradient(circle, rgba(34,211,238,0.09) 0%, transparent 70%)",
                       animation: "previewGlow 2.6s ease-in-out infinite",
                     }}
                   />
                   <div
                     className="absolute inset-0"
                     style={{
-                      background: "linear-gradient(108deg, transparent 38%, rgba(34,211,238,0.03) 50%, transparent 62%)",
+                      background:
+                        "linear-gradient(108deg, transparent 38%, rgba(34,211,238,0.03) 50%, transparent 62%)",
                       backgroundSize: "200% 100%",
                       animation: "previewShimmer 2.8s ease-in-out infinite",
                     }}
@@ -302,51 +317,129 @@ export default function CropTool({ image }: CropToolProps) {
                     className="absolute left-5 right-5"
                     style={{
                       height: "1px",
-                      background: "linear-gradient(90deg, transparent 0%, rgba(34,211,238,0.35) 20%, rgba(34,211,238,0.85) 50%, rgba(34,211,238,0.35) 80%, transparent 100%)",
-                      boxShadow: "0 0 6px rgba(34,211,238,0.55), 0 0 18px rgba(34,211,238,0.18)",
+                      background:
+                        "linear-gradient(90deg, transparent 0%, rgba(34,211,238,0.35) 20%, rgba(34,211,238,0.85) 50%, rgba(34,211,238,0.35) 80%, transparent 100%)",
+                      boxShadow:
+                        "0 0 6px rgba(34,211,238,0.55), 0 0 18px rgba(34,211,238,0.18)",
                       animation: "previewScan 2.2s ease-in-out infinite",
                     }}
                   />
                   {[
-                    { top: 12, left: 12, borderTop: true, borderLeft: true, delay: "0s" },
-                    { top: 12, right: 12, borderTop: true, borderRight: true, delay: "0.15s" },
-                    { bottom: 12, left: 12, borderBottom: true, borderLeft: true, delay: "0.3s" },
-                    { bottom: 12, right: 12, borderBottom: true, borderRight: true, delay: "0.45s" },
+                    {
+                      top: 12,
+                      left: 12,
+                      borderTop: true,
+                      borderLeft: true,
+                      delay: "0s",
+                    },
+                    {
+                      top: 12,
+                      right: 12,
+                      borderTop: true,
+                      borderRight: true,
+                      delay: "0.15s",
+                    },
+                    {
+                      bottom: 12,
+                      left: 12,
+                      borderBottom: true,
+                      borderLeft: true,
+                      delay: "0.3s",
+                    },
+                    {
+                      bottom: 12,
+                      right: 12,
+                      borderBottom: true,
+                      borderRight: true,
+                      delay: "0.45s",
+                    },
                   ].map((c, i) => (
                     <div
                       key={i}
                       className="absolute"
                       style={{
-                        width: 18, height: 18,
+                        width: 18,
+                        height: 18,
                         ...(c.top !== undefined && { top: c.top }),
                         ...(c.bottom !== undefined && { bottom: c.bottom }),
                         ...(c.left !== undefined && { left: c.left }),
                         ...(c.right !== undefined && { right: c.right }),
-                        borderTop: c.borderTop ? "1.5px solid rgba(34,211,238,0.7)" : undefined,
-                        borderBottom: c.borderBottom ? "1.5px solid rgba(34,211,238,0.7)" : undefined,
-                        borderLeft: c.borderLeft ? "1.5px solid rgba(34,211,238,0.7)" : undefined,
-                        borderRight: c.borderRight ? "1.5px solid rgba(34,211,238,0.7)" : undefined,
+                        borderTop: c.borderTop
+                          ? "1.5px solid rgba(34,211,238,0.7)"
+                          : undefined,
+                        borderBottom: c.borderBottom
+                          ? "1.5px solid rgba(34,211,238,0.7)"
+                          : undefined,
+                        borderLeft: c.borderLeft
+                          ? "1.5px solid rgba(34,211,238,0.7)"
+                          : undefined,
+                        borderRight: c.borderRight
+                          ? "1.5px solid rgba(34,211,238,0.7)"
+                          : undefined,
                         animation: `previewCornerPulse 2.6s ease-in-out ${c.delay} infinite`,
                       }}
                     />
                   ))}
                   <div className="relative z-10 flex flex-col items-center gap-4">
                     <div className="relative" style={{ width: 52, height: 52 }}>
-                      <div className="absolute inset-0 rounded-full" style={{ border: "1.5px solid rgba(34,211,238,0.08)" }} />
-                      <div className="absolute inset-0 rounded-full" style={{ border: "1.5px solid transparent", borderTopColor: "rgba(34,211,238,0.85)", borderRightColor: "rgba(34,211,238,0.25)", animation: "previewSpin 1.1s linear infinite" }} />
-                      <div className="absolute inset-2 rounded-full" style={{ border: "1px solid rgba(34,211,238,0.06)" }} />
-                      <div className="absolute inset-2 rounded-full" style={{ border: "1px solid transparent", borderTopColor: "rgba(34,211,238,0.5)", borderLeftColor: "rgba(34,211,238,0.15)", animation: "previewSpinReverse 0.75s linear infinite" }} />
+                      <div
+                        className="absolute inset-0 rounded-full"
+                        style={{ border: "1.5px solid rgba(34,211,238,0.08)" }}
+                      />
+                      <div
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          border: "1.5px solid transparent",
+                          borderTopColor: "rgba(34,211,238,0.85)",
+                          borderRightColor: "rgba(34,211,238,0.25)",
+                          animation: "previewSpin 1.1s linear infinite",
+                        }}
+                      />
+                      <div
+                        className="absolute inset-2 rounded-full"
+                        style={{ border: "1px solid rgba(34,211,238,0.06)" }}
+                      />
+                      <div
+                        className="absolute inset-2 rounded-full"
+                        style={{
+                          border: "1px solid transparent",
+                          borderTopColor: "rgba(34,211,238,0.5)",
+                          borderLeftColor: "rgba(34,211,238,0.15)",
+                          animation: "previewSpinReverse 0.75s linear infinite",
+                        }}
+                      />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div style={{ width: 5, height: 5, borderRadius: "50%", background: "rgba(34,211,238,0.9)", boxShadow: "0 0 6px rgba(34,211,238,0.7)", animation: "previewGlow 2.6s ease-in-out infinite" }} />
+                        <div
+                          style={{
+                            width: 5,
+                            height: 5,
+                            borderRadius: "50%",
+                            background: "rgba(34,211,238,0.9)",
+                            boxShadow: "0 0 6px rgba(34,211,238,0.7)",
+                            animation: "previewGlow 2.6s ease-in-out infinite",
+                          }}
+                        />
                       </div>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-[10px] font-mono tracking-[0.22em] uppercase" style={{ color: "rgba(34,211,238,0.65)" }}>
+                      <span
+                        className="text-[10px] font-mono tracking-[0.22em] uppercase"
+                        style={{ color: "rgba(34,211,238,0.65)" }}
+                      >
                         Rendering Preview
                       </span>
                       <div className="flex gap-1.5">
                         {[0, 0.22, 0.44].map((delay, i) => (
-                          <div key={i} style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(34,211,238,0.6)", animation: `previewDot 1.5s ease-in-out ${delay}s infinite` }} />
+                          <div
+                            key={i}
+                            style={{
+                              width: 3,
+                              height: 3,
+                              borderRadius: "50%",
+                              background: "rgba(34,211,238,0.6)",
+                              animation: `previewDot 1.5s ease-in-out ${delay}s infinite`,
+                            }}
+                          />
                         ))}
                       </div>
                     </div>
@@ -359,16 +452,28 @@ export default function CropTool({ image }: CropToolProps) {
                 className="rounded-lg object-contain"
                 onLoad={() => setIsPreviewLoading(false)}
                 onError={() => setIsPreviewLoading(false)}
-                style={{ maxHeight: "52vh", maxWidth: "100%", display: isPreviewLoading ? "none" : "block" }}
+                style={{
+                  maxHeight: "52vh",
+                  maxWidth: "100%",
+                  display: isPreviewLoading ? "none" : "block",
+                }}
               />
               {!isPreviewLoading && (
-                <p className="text-[10px] font-mono" style={{ color: "rgba(186,230,255,0.3)" }}>
-                  {completedCrop ? `${Math.round(completedCrop.width)} × ${Math.round(completedCrop.height)} px (display)` : ""}
+                <p
+                  className="text-[10px] font-mono"
+                  style={{ color: "rgba(186,230,255,0.3)" }}
+                >
+                  {completedCrop
+                    ? `${Math.round(completedCrop.width)} × ${Math.round(completedCrop.height)} px (display)`
+                    : ""}
                 </p>
               )}
             </>
           ) : (
-            <p className="text-xs font-mono" style={{ color: "rgba(186,230,255,0.25)" }}>
+            <p
+              className="text-xs font-mono"
+              style={{ color: "rgba(186,230,255,0.25)" }}
+            >
               Draw a crop area to see preview
             </p>
           )}
@@ -380,7 +485,11 @@ export default function CropTool({ image }: CropToolProps) {
       {saveSuccess && (
         <div
           className="px-4 py-3 rounded-lg text-sm mb-4"
-          style={{ background: "rgba(34,211,238,0.07)", border: "1px solid rgba(34,211,238,0.2)", color: "#22D3EE" }}
+          style={{
+            background: "rgba(34,211,238,0.07)",
+            border: "1px solid rgba(34,211,238,0.2)",
+            color: "#22D3EE",
+          }}
         >
           {saveSuccess}
         </div>
