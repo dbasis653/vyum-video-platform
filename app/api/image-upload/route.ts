@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-// uploadImage — uploads a file to Cloudinary and creates the DB row linked to the user.
-// Extracted to services/image.service.ts — keeps this route file thin (HTTP concerns only).
 import { uploadImage } from "@/services/image.service";
 
 // Maps a service error (with optional .status) to a NextResponse.

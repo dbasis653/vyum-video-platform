@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-// getImages — fetches all images owned by the authenticated user, ordered newest first.
-// Extracted to services/image.service.ts — keeps this route file thin (HTTP concerns only).
 import { getImages } from "@/services/image.service";
 
 // Maps a service error (with optional .status) to a NextResponse.

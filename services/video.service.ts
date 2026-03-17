@@ -1,17 +1,6 @@
-// cloudinary — pre-configured Cloudinary v2 instance (credentials loaded from env)
-// Shared singleton from lib/cloudinary.ts — never repeat cloudinary.config() in a service file.
 import cloudinary from "@/lib/cloudinary";
-
-// prisma — shared PrismaClient singleton; never instantiate PrismaClient locally.
-// Singleton prevents connection pool exhaustion in serverless environments.
 import { prisma } from "@/lib/prisma";
-
-// resolveDbUser — fetches the DB User row for a given Clerk userId.
-// Shared from lib/auth.ts to avoid repeating prisma.user.findUnique in every service function.
 import { resolveDbUser } from "@/lib/auth";
-
-// CloudinaryUploadResult — shared interface for Cloudinary upload API responses.
-// Extracted to types/ so it is never duplicated across service or route files.
 import { type CloudinaryUploadResult } from "@/types";
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────

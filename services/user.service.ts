@@ -1,10 +1,4 @@
-// prisma — shared PrismaClient singleton; never instantiate PrismaClient locally.
-// Singleton prevents connection pool exhaustion in serverless environments.
 import { prisma } from "@/lib/prisma";
-
-// clerkClient — Clerk server SDK; imported here because the service needs to fetch the user's
-// email on upsert and update publicMetadata after the DB write. Kept here (not in the route)
-// so the Clerk API calls stay with the business logic they support.
 import { clerkClient } from "@clerk/nextjs/server";
 
 // ─── Private helpers ──────────────────────────────────────────────────────────

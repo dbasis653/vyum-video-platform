@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-// completeOnboarding — checks username uniqueness, upserts the user row, sets Clerk metadata.
-// Extracted to services/user.service.ts — keeps this route file thin (HTTP concerns only).
 import { completeOnboarding } from "@/services/user.service";
 
 // Regex: only letters, digits, and underscores; 3 to 20 characters.

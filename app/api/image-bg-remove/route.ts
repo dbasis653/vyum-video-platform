@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-// bgRemoveImage / BgRemoveImageParams — applies AI background removal and saves the result.
-// Extracted to services/image.service.ts — keeps this route file thin (HTTP concerns only).
 import {
   bgRemoveImage,
   type BgRemoveImageParams,

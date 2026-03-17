@@ -10,20 +10,9 @@ import ErrorBanner from "@/components/ui/ErrorBanner";
 import Spinner from "@/components/ui/Spinner";
 import Button from "@/components/ui/Button";
 
-// PRESETS / PRESET_SUFFIX — crop aspect-ratio presets and filename suffix map.
-// Kept in lib/constants so any future crop-related component shares the same definitions.
 import { PRESETS, PRESET_SUFFIX } from "@/lib/constants/cropPresets";
-
-// useImageSave — shared save/download state + handlers for playground tools.
-// Extracted to hooks/ — identical pattern was duplicated in CropTool and BgRemoveTool.
 import { useImageSave } from "@/hooks/useImageSave";
-
-// ProcessingSkeleton — animated loading indicator shown while a transformation renders.
-// Extracted to components/ui/ — identical animation was duplicated in CropTool and BgRemoveTool.
 import ProcessingSkeleton from "@/components/ui/ProcessingSkeleton";
-
-// EditorShell — shared two-panel grid layout (left canvas, right preview).
-// Extracted to components/playground/ — identical layout was duplicated in CropTool and BgRemoveTool.
 import EditorShell from "@/components/playground/EditorShell";
 
 // Calculates a centered crop box that fits within imgW × imgH while preserving the given aspect ratio.

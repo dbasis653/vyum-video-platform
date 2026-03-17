@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-// updateVideo / deleteVideo — video CRUD with ownership checks.
-// Extracted to services/video.service.ts — keeps this route file thin (HTTP concerns only).
 import { updateVideo, deleteVideo } from "@/services/video.service";
 
 // Maps a service error (with optional .status) to a NextResponse.

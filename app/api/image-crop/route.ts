@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-// cropImage / CropImageParams — applies a crop transformation and saves the result.
-// Extracted to services/image.service.ts — keeps this route file thin (HTTP concerns only).
 import { cropImage, type CropImageParams } from "@/services/image.service";
 
 // Maps a service error (with optional .status) to a NextResponse.

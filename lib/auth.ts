@@ -1,5 +1,3 @@
-// prisma — shared PrismaClient singleton; never instantiate PrismaClient locally.
-// Singleton prevents connection pool exhaustion in serverless environments.
 import { prisma } from "@/lib/prisma";
 
 // Looks up the DB User row corresponding to a Clerk userId.

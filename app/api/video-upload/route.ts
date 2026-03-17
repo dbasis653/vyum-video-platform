@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-// uploadVideo — uploads a video to Cloudinary with compression, creates the DB row.
-// Extracted to services/video.service.ts — keeps this route file thin (HTTP concerns only).
 import { uploadVideo } from "@/services/video.service";
 
 // Maps a service error (with optional .status) to a NextResponse.

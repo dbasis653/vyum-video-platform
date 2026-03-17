@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { getCldImageUrl } from "next-cloudinary";
 import { Download, Wand2 } from "lucide-react";
@@ -9,19 +9,9 @@ import ErrorBanner from "@/components/ui/ErrorBanner";
 import Spinner from "@/components/ui/Spinner";
 import Button from "@/components/ui/Button";
 
-// BgOutput — union type "transparent" | "white"; kept in lib/constants to stay in sync with the API.
 import { type BgOutput } from "@/lib/constants/bgRemove";
-
-// useImageSave — shared save/download state + handlers for playground tools.
-// Extracted to hooks/ — identical pattern was duplicated in CropTool and BgRemoveTool.
 import { useImageSave } from "@/hooks/useImageSave";
-
-// ProcessingSkeleton — animated loading indicator shown while a transformation runs.
-// Extracted to components/ui/ — identical animation was duplicated in CropTool and BgRemoveTool.
 import ProcessingSkeleton from "@/components/ui/ProcessingSkeleton";
-
-// EditorShell — shared two-panel grid layout (original left, result right).
-// Extracted to components/playground/ — identical layout was duplicated in CropTool and BgRemoveTool.
 import EditorShell from "@/components/playground/EditorShell";
 
 // ─── Component ────────────────────────────────────────────────────────────────

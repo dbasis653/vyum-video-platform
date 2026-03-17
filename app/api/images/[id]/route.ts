@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-// getImageById / updateImage / deleteImage — image CRUD with ownership checks.
-// Extracted to services/image.service.ts — keeps this route file thin (HTTP concerns only).
 import { getImageById, updateImage, deleteImage } from "@/services/image.service";
 
 // Maps a service error (with optional .status) to a NextResponse.

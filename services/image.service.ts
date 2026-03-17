@@ -1,27 +1,12 @@
-// cloudinary — pre-configured Cloudinary v2 instance (credentials loaded from env)
-// Shared singleton from lib/cloudinary.ts — never repeat cloudinary.config() in a service file.
 import cloudinary from "@/lib/cloudinary";
-
-// prisma — shared PrismaClient singleton; never instantiate PrismaClient locally.
-// Singleton prevents connection pool exhaustion in serverless environments.
 import { prisma } from "@/lib/prisma";
-
-// resolveDbUser — fetches the DB User row for a given Clerk userId.
-// Shared from lib/auth.ts to avoid repeating prisma.user.findUnique in every service function.
 import { resolveDbUser } from "@/lib/auth";
-
-// BG_REMOVE_EFFECT / BG_REMOVE_FINE_EDGES_EFFECT / BG_REMOVE_FOLDER / BgOutput —
-// Cloudinary transformation constants and the BgOutput union type.
-// Kept in lib/constants to stay in sync across service and any future UI consumers.
 import {
   BG_REMOVE_EFFECT,
   BG_REMOVE_FINE_EDGES_EFFECT,
   BG_REMOVE_FOLDER,
   type BgOutput,
 } from "@/lib/constants/bgRemove";
-
-// CloudinaryUploadResult — shared interface for Cloudinary upload API responses.
-// Extracted to types/ so it is never duplicated across service or route files.
 import { type CloudinaryUploadResult } from "@/types";
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
@@ -42,6 +27,11 @@ async function waitForReady(url: string): Promise<void> {
   for (let i = 0; i < 20; i++) {
     const res = await fetch(url, { method: "GET" });
     if (res.ok) return;
+    if (res.status === 420) {
+      throw new Error(
+        "Background removal credits exhausted. Your monthly Cloudinary limit has been reached. Please try again next month or upgrade your Cloudinary plan.",
+      );
+    }
     if (res.status !== 423) {
       throw new Error(`Cloudinary returned unexpected status ${res.status}`);
     }
@@ -121,26 +111,33 @@ export async function deleteImage(clerkUserId: string, imageId: string) {
 // Uploads an image file to Cloudinary and creates a DB row linked to the caller.
 // Throws 404 if the user account isn't ready yet (webhook race condition on first sign-in).
 // Returns { id, publicId } — both are needed for playground navigation.
-export async function uploadImage(clerkUserId: string, file: File, title: string) {
+export async function uploadImage(
+  clerkUserId: string,
+  file: File,
+  title: string,
+) {
   // 1. Resolve DB user — webhook creates this row on first sign-up
   const dbUser = await resolveDbUser(clerkUserId);
-  if (!dbUser) httpError(404, "User account not ready. Please refresh and try again.");
+  if (!dbUser)
+    httpError(404, "User account not ready. Please refresh and try again.");
 
   // 2. Buffer the file for upload_stream
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
   // 3. Upload to Cloudinary
-  const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "images" },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result as CloudinaryUploadResult);
-      },
-    );
-    uploadStream.end(buffer);
-  });
+  const result = await new Promise<CloudinaryUploadResult>(
+    (resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "images" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result as CloudinaryUploadResult);
+        },
+      );
+      uploadStream.end(buffer);
+    },
+  );
 
   // 4. Store metadata in DB, linking the image to its owner via userId
   const image = await prisma.image.create({
@@ -191,16 +188,18 @@ export async function cropImage(clerkUserId: string, params: CropImageParams) {
 
   if (mode === "copy") {
     // 3a. Upload cropped image as a brand new Cloudinary asset
-    const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
-      cloudinary.uploader.upload(
-        transformedUrl,
-        { folder: "images" },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result as CloudinaryUploadResult);
-        },
-      );
-    });
+    const result = await new Promise<CloudinaryUploadResult>(
+      (resolve, reject) => {
+        cloudinary.uploader.upload(
+          transformedUrl,
+          { folder: "images" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result as CloudinaryUploadResult);
+          },
+        );
+      },
+    );
 
     // 4a. Create a new DB row for the cropped copy
     return prisma.image.create({
@@ -214,16 +213,18 @@ export async function cropImage(clerkUserId: string, params: CropImageParams) {
     });
   } else {
     // 3b. Overwrite: upload with the same public_id + invalidate CDN cache
-    const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
-      cloudinary.uploader.upload(
-        transformedUrl,
-        { public_id: image.publicId, overwrite: true, invalidate: true },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result as CloudinaryUploadResult);
-        },
-      );
-    });
+    const result = await new Promise<CloudinaryUploadResult>(
+      (resolve, reject) => {
+        cloudinary.uploader.upload(
+          transformedUrl,
+          { public_id: image.publicId, overwrite: true, invalidate: true },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result as CloudinaryUploadResult);
+          },
+        );
+      },
+    );
 
     // 4b. Update the DB row with the new dimensions
     return prisma.image.update({
@@ -251,8 +252,17 @@ export interface BgRemoveImageParams {
 // mode "copy": uploads as a new asset and creates a new DB row.
 // mode "overwrite": re-uploads with same public_id and updates the DB row.
 // Throws 404 / 403 on ownership failures.
-export async function bgRemoveImage(clerkUserId: string, params: BgRemoveImageParams) {
-  const { imageId, fineEdges = false, bgOutput = "transparent", mode, title } = params;
+export async function bgRemoveImage(
+  clerkUserId: string,
+  params: BgRemoveImageParams,
+) {
+  const {
+    imageId,
+    fineEdges = false,
+    bgOutput = "transparent",
+    mode,
+    title,
+  } = params;
 
   // 1. Fetch image + ownership check
   const image = await prisma.image.findUnique({ where: { id: imageId } });
@@ -282,16 +292,18 @@ export async function bgRemoveImage(clerkUserId: string, params: BgRemoveImagePa
 
   if (mode === "copy") {
     // 5a. The URL is now cached (200), safe to pass to uploader.upload()
-    const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
-      cloudinary.uploader.upload(
-        bgRemovedUrl,
-        { folder: BG_REMOVE_FOLDER },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result as CloudinaryUploadResult);
-        },
-      );
-    });
+    const result = await new Promise<CloudinaryUploadResult>(
+      (resolve, reject) => {
+        cloudinary.uploader.upload(
+          bgRemovedUrl,
+          { folder: BG_REMOVE_FOLDER },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result as CloudinaryUploadResult);
+          },
+        );
+      },
+    );
 
     // 6a. Create a new DB row for the bg-removed copy
     return prisma.image.create({
@@ -307,16 +319,18 @@ export async function bgRemoveImage(clerkUserId: string, params: BgRemoveImagePa
 
   // mode === "overwrite"
   // 5b. Upload with the same public_id + invalidate CDN cache
-  const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
-    cloudinary.uploader.upload(
-      bgRemovedUrl,
-      { public_id: image.publicId, overwrite: true, invalidate: true },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result as CloudinaryUploadResult);
-      },
-    );
-  });
+  const result = await new Promise<CloudinaryUploadResult>(
+    (resolve, reject) => {
+      cloudinary.uploader.upload(
+        bgRemovedUrl,
+        { public_id: image.publicId, overwrite: true, invalidate: true },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result as CloudinaryUploadResult);
+        },
+      );
+    },
+  );
 
   // 6b. Update the DB row with the new dimensions (PNG may differ slightly)
   return prisma.image.update({
