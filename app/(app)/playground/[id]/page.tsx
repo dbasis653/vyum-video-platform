@@ -36,47 +36,74 @@ export default function PlaygroundPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return (
-    <div className="max-w-6xl mx-auto animate-pulse">
-      {/* Header skeleton */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-6 h-6 rounded" style={{ background: "rgba(34,211,238,0.08)" }} />
-        <div className="h-3 w-48 rounded" style={{ background: "rgba(34,211,238,0.08)" }} />
-      </div>
-
-      {/* Tool tabs skeleton */}
-      <div className="flex gap-2 mb-6">
-        {[80, 96].map((w) => (
+  if (loading)
+    return (
+      <div className="max-w-6xl mx-auto animate-pulse">
+        {/* Header skeleton */}
+        <div className="flex items-center gap-3 mb-6">
           <div
-            key={w}
-            className="h-8 rounded-lg"
-            style={{ width: w, background: "rgba(34,211,238,0.07)", border: "1px solid rgba(34,211,238,0.1)" }}
+            className="w-6 h-6 rounded"
+            style={{ background: "rgba(34,211,238,0.08)" }}
           />
-        ))}
-      </div>
+          <div
+            className="h-3 w-48 rounded"
+            style={{ background: "rgba(34,211,238,0.08)" }}
+          />
+        </div>
 
-      {/* Main content skeleton — image left, controls right */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
-        {/* Image area */}
-        <div
-          className="rounded-2xl aspect-video"
-          style={{ background: "rgba(34,211,238,0.05)", border: "1px solid rgba(34,211,238,0.08)" }}
-        />
-
-        {/* Controls panel */}
-        <div
-          className="rounded-2xl p-5 flex flex-col gap-4"
-          style={{ background: "#0f1929", border: "1px solid rgba(34,211,238,0.1)" }}
-        >
-          <div className="h-3 w-24 rounded" style={{ background: "rgba(34,211,238,0.08)" }} />
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-10 rounded-lg" style={{ background: "rgba(34,211,238,0.06)" }} />
+        {/* Tool tabs skeleton */}
+        <div className="flex gap-2 mb-6">
+          {[80, 96].map((w) => (
+            <div
+              key={w}
+              className="h-8 rounded-lg"
+              style={{
+                width: w,
+                background: "rgba(34,211,238,0.07)",
+                border: "1px solid rgba(34,211,238,0.1)",
+              }}
+            />
           ))}
-          <div className="mt-auto h-10 rounded-lg" style={{ background: "rgba(34,211,238,0.1)" }} />
+        </div>
+
+        {/* Main content skeleton — image left, controls right */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+          {/* Image area */}
+          <div
+            className="rounded-2xl aspect-video"
+            style={{
+              background: "rgba(34,211,238,0.05)",
+              border: "1px solid rgba(34,211,238,0.08)",
+            }}
+          />
+
+          {/* Controls panel */}
+          <div
+            className="rounded-2xl p-5 flex flex-col gap-4"
+            style={{
+              background: "#0f1929",
+              border: "1px solid rgba(34,211,238,0.1)",
+            }}
+          >
+            <div
+              className="h-3 w-24 rounded"
+              style={{ background: "rgba(34,211,238,0.08)" }}
+            />
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="h-10 rounded-lg"
+                style={{ background: "rgba(34,211,238,0.06)" }}
+              />
+            ))}
+            <div
+              className="mt-auto h-10 rounded-lg"
+              style={{ background: "rgba(34,211,238,0.1)" }}
+            />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
   if (fetchError) return <ErrorBanner message={fetchError} />;
   if (!image) return null;
 
@@ -103,8 +130,8 @@ export default function PlaygroundPage() {
                 color: tool.comingSoon
                   ? "rgba(186,230,255,0.2)"
                   : active
-                  ? "#22D3EE"
-                  : "rgba(186,230,255,0.45)",
+                    ? "#22D3EE"
+                    : "rgba(186,230,255,0.45)",
                 cursor: tool.comingSoon ? "not-allowed" : "pointer",
               }}
               title={tool.comingSoon ? "Coming soon" : tool.label}

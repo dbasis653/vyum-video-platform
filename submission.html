@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vyum – Agentic Build Submission</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.75;
+      color: #1a1a2e;
+      background: #ffffff;
+      padding: 0;
+    }
+
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 60px 64px 80px;
+    }
+
+    /* ── Cover Header ── */
+    .cover {
+      border-bottom: 3px solid #4f46e5;
+      padding-bottom: 36px;
+      margin-bottom: 52px;
+    }
+
+    .cover-tag {
+      display: inline-block;
+      background: #eef2ff;
+      color: #4f46e5;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+
+    .cover h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #0f0f23;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .cover-sub {
+      font-size: 15px;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 52px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .section-number {
+      background: #4f46e5;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f0f23;
+    }
+
+    /* ── Subsection ── */
+    h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #4f46e5;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 28px 0 10px;
+    }
+
+    h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0f0f23;
+      margin: 22px 0 6px;
+    }
+
+    p {
+      color: #374151;
+      margin-bottom: 12px;
+    }
+
+    /* ── Phase boxes ── */
+    .phases {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .phase {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #f8faff;
+      border: 1px solid #e0e7ff;
+      border-left: 4px solid #4f46e5;
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+
+    .phase-badge {
+      background: #4f46e5;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .phase-text {
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.6;
+    }
+
+    /* ── Workflow code block ── */
+    .workflow {
+      background: #0f0f23;
+      color: #a5b4fc;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 18px 22px;
+      border-radius: 10px;
+      margin: 16px 0;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Numbered steps ── */
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      margin: 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      background: #eef2ff;
+      color: #4f46e5;
+      font-size: 12px;
+      font-weight: 700;
+      min-width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .steps li span {
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.65;
+    }
+
+    .steps li strong {
+      color: #0f0f23;
+    }
+
+    /* ── Priority ordered list ── */
+    .priority-list {
+      list-style: none;
+      margin: 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .priority-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .priority-list li::before {
+      content: '→';
+      color: #4f46e5;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── Loop callout ── */
+    .callout {
+      background: #faf5ff;
+      border: 1px solid #ddd6fe;
+      border-left: 4px solid #7c3aed;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 14px;
+      color: #4c1d95;
+      font-weight: 500;
+    }
+
+    /* ── Tech table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13.5px;
+    }
+
+    thead tr {
+      background: #0f0f23;
+      color: #fff;
+    }
+
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      color: #374151;
+      vertical-align: top;
+    }
+
+    tbody td:first-child {
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tbody td:nth-child(2) {
+      font-weight: 600;
+      color: #0f0f23;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .highlight-row td {
+      background: #eef2ff !important;
+    }
+
+    .highlight-row td:nth-child(2) {
+      color: #4f46e5;
+    }
+
+    .planned-row td {
+      color: #9ca3af !important;
+      font-style: italic;
+    }
+
+    /* ── Feature cards ── */
+    .feature-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 14px 0;
+    }
+
+    .feature-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f0f23;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feature-dot {
+      width: 8px;
+      height: 8px;
+      background: #4f46e5;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      margin: 0;
+    }
+
+    /* ── Why This Matters cards ── */
+    .matters-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .matters-card {
+      display: flex;
+      gap: 16px;
+      background: #f8faff;
+      border: 1px solid #e0e7ff;
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+
+    .matters-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .matters-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f0f23;
+      margin-bottom: 5px;
+    }
+
+    .matters-body {
+      font-size: 13.5px;
+      color: #4b5563;
+      margin: 0;
+    }
+
+    /* ── Cloudinary note ── */
+    .note {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #16a34a;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13.5px;
+      color: #166534;
+      margin: 14px 0;
+    }
+
+    /* ── Restructure callout ── */
+    .restructure {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-left: 4px solid #ea580c;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 16px 0;
+    }
+
+    .restructure-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #c2410c;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .restructure ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .restructure ul li {
+      font-size: 13.5px;
+      color: #7c2d12;
+      display: flex;
+      gap: 8px;
+    }
+
+    .restructure ul li::before {
+      content: '▸';
+      color: #ea580c;
+      flex-shrink: 0;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; }
+      .page { padding: 40px 48px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Cover -->
+  <div class="cover">
+    <div class="cover-tag">Agentic Build Submission</div>
+    <h1>Vyum — AI Media Workplace</h1>
+    <p class="cover-sub">Built with Claude Code · Next.js · Cloudinary · Clerk · Neon PostgreSQL</p>
+  </div>
+
+  <!-- ── Section 1 ── -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-number">1</div>
+      <div class="section-title">Problem Statement</div>
+    </div>
+
+    <h3>What Problem?</h3>
+    <p>Content creators and developers today waste hours switching between tools — Photoshop for edits, CapCut for cuts, remove.bg for background removal, Canva for social exports, and separate AI tools for generation. There is no single browser-based platform that unifies AI-powered image editing (background removal, smart crop, transformations), video processing (compression, timeline editing, clip arrangement), and AI generation (image/video/animation) in one authenticated, per-user workspace.</p>
+
+    <p>The vision is a complete AI media workplace:</p>
+
+    <div class="phases">
+      <div class="phase">
+        <span class="phase-badge">Phase 1 — Now</span>
+        <span class="phase-text">Core image transformations using Cloudinary's API — background removal, smart crop for social formats, filters, enhancements — making it a genuinely usable image editor in the browser.</span>
+      </div>
+      <div class="phase">
+        <span class="phase-badge">Phase 2</span>
+        <span class="phase-text">A drag-and-drop timeline editor where users arrange image/video clips, with server-side export via FFmpeg — enabling short-form video creation (Reels, Shorts).</span>
+      </div>
+      <div class="phase">
+        <span class="phase-badge">Phase 3</span>
+        <span class="phase-text">Integration of AI generation models (image-to-video, animation, text-to-video) to complete the end-to-end AI media pipeline.</span>
+      </div>
+    </div>
+
+    <h3>Why This Problem?</h3>
+    <p>In the current AI video-making era, short-form content (30-second Reels, YouTube Shorts) is the dominant format. If a platform can combine Cloudinary's transformation API with AI generation models for that last-mile video output — actual clip rendering with transitions, effects, and AI-generated segments — it becomes a genuinely useful tool for creators who don't have the budget for Adobe or the technical skill to stitch together multiple APIs themselves. Starting with image hero-features first ensures the foundation is solid before the timeline and generation layers are added on top.</p>
+  </div>
+
+  <!-- ── Section 2 ── -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-number">2</div>
+      <div class="section-title">Approach & Thought Process</div>
+    </div>
+
+    <h3>Idea Workflow</h3>
+    <div class="workflow">Feature Decision → Design → Break into subtasks → Implement with Claude Code → Test → Debug → Deploy</div>
+
+    <h3>Feature Prioritization Order</h3>
+    <p>The stack was validated early with video upload and compression — this proved the Cloudinary integration, DB pipeline, and per-user auth worked end-to-end. After that, priority deliberately shifted to the image pipeline. The reasoning: image transformations are stateless, faster to ship, and easier to test. Completing the image hero-features first also means the playground UI and editor shell are mature before the timeline feature is introduced — so the timeline can be tested against real, already-working tools rather than being built in isolation.</p>
+
+    <ul class="priority-list">
+      <li>Core infra (auth, DB, Cloudinary, file upload)</li>
+      <li>Video upload + compression (stack validation)</li>
+      <li>Image pipeline — crop, bg-remove, transformations (hero features, foundation for timeline)</li>
+      <li>Timeline editor — drag-and-drop clip arrangement, FFmpeg server-side export</li>
+      <li>AI generation models — image/video generation, animation</li>
+    </ul>
+
+    <h3>What Made the Approach Unique</h3>
+    <p>Claude Code was used as an autonomous agent, not autocomplete. But more importantly, the developer workflow around it was deliberate:</p>
+
+    <ol class="steps">
+      <li><span><strong>Design before implementation.</strong> Before writing a single line, the full feature pipeline was designed — what the data flow looks like, which files need to be created vs. updated, what the folder structure should be, how the API route connects to the component, where shared logic lives.</span></li>
+      <li><span><strong>Confirm the plan, then implement.</strong> Claude Code was asked to plan first — list the files, describe what each does, explain the data flow. Only after reviewing and approving that plan was it given the green light to implement. This prevents AI agents from drifting from the intended architecture.</span></li>
+      <li><span><strong>Post-implementation review.</strong> After every feature, the generated code was reviewed against the original design: Did the API route follow the established auth pattern? Did shared constants end up in the right place? Did the component structure match what was designed?</span></li>
+    </ol>
+
+    <div class="callout">
+      Design → Approve → Implement → Review — The agent handles execution. The developer owns the architecture.
+    </div>
+  </div>
+
+  <!-- ── Section 3 ── -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-number">3</div>
+      <div class="section-title">Tech Stack</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Tool</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Framework</td>
+          <td>Next.js 16</td>
+          <td>Full-stack React framework, App Router, API routes + pages</td>
+        </tr>
+        <tr>
+          <td>Auth</td>
+          <td>Clerk</td>
+          <td>Authentication, webhooks, middleware onboarding gate</td>
+        </tr>
+        <tr>
+          <td>Database</td>
+          <td>Prisma 7 + Neon</td>
+          <td>ORM + serverless PostgreSQL (cloud-hosted)</td>
+        </tr>
+        <tr>
+          <td>Media AI</td>
+          <td>Cloudinary</td>
+          <td>Upload, compression, bg-remove, smart crop, format/quality auto, CDN delivery</td>
+        </tr>
+        <tr>
+          <td>UI</td>
+          <td>Tailwind + DaisyUI 5</td>
+          <td>Styling and component library (forest theme)</td>
+        </tr>
+        <tr>
+          <td>Language</td>
+          <td>TypeScript</td>
+          <td>Type safety across frontend and backend</td>
+        </tr>
+        <tr class="highlight-row">
+          <td>Agentic Tool</td>
+          <td>Claude Code</td>
+          <td>Primary development agent — plans, implements, debugs, enforces architecture</td>
+        </tr>
+        <tr>
+          <td>Deployment</td>
+          <td>Vercel</td>
+          <td>CI/CD and hosting</td>
+        </tr>
+        <tr class="planned-row">
+          <td>Planned</td>
+          <td>FFmpeg</td>
+          <td>Server-side timeline export — stitching clips into final video</td>
+        </tr>
+        <tr class="planned-row">
+          <td>Planned</td>
+          <td>AI Gen APIs</td>
+          <td>Last-mile video/image/animation generation</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>On Cloudinary:</strong> Cloudinary is not just storage here — it's the transformation engine. Features like <code>e_background_removal</code>, AI-powered gravity for smart crop, and format/quality auto-conversion do the heavy lifting that would otherwise require a dedicated ML pipeline. This lets the platform deliver AI-powered edits without running any models directly.
+    </div>
+  </div>
+
+  <!-- ── Section 4 ── -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-number">4</div>
+      <div class="section-title">Build Explanation</div>
+    </div>
+
+    <p>Each feature follows the same vertical slice pattern — API route → service layer → component → page integration. The API handles auth and calls Cloudinary. The component handles UI state and calls the API. Everything typed, everything per-user.</p>
+
+    <h3>App Restructuring for Future Scope</h3>
+    <p>Before implementing new features, the app architecture was deliberately restructured with future scope in mind. The early version had features loosely tied to pages — no shared shell, no common dashboard, tools scattered across routes. That doesn't scale when the roadmap includes a timeline editor, AI generation tools, and multi-format exports.</p>
+
+    <div class="restructure">
+      <div class="restructure-title">Redesigned Structure</div>
+      <ul>
+        <li>A <strong>common dashboard</strong> that will eventually surface all media (images, videos, generated clips) in one place</li>
+        <li>A <strong>unified editor shell</strong> (EditorShell.tsx) that all tools (crop, bg-remove, future transformations) load into — shared image state, shared loading skeleton, shared layout</li>
+        <li>A <strong>playground route</strong> (/playground/[id]) that acts as the container, keeping tool-switching stateful</li>
+      </ul>
+    </div>
+    <p>This means when the timeline editor is added, it slots into an already-mature shell rather than requiring a second full restructure. The restructuring cost is paid once now, not repeatedly later.</p>
+
+    <h3>Implementation with Claude Code</h3>
+    <p>This is where the agentic workflow shows its value most clearly. For each feature, the flow was:</p>
+
+    <ol class="steps">
+      <li><span><strong>Design the pipeline</strong> — data flow mapped out before any code: which files get created, which get updated, what each layer's responsibility is.</span></li>
+      <li><span><strong>Claude Code plans first</strong> — asked to list files and describe what each does before writing anything.</span></li>
+      <li><span><strong>Approve the plan</strong> — review the proposed structure against the design, confirm it matches.</span></li>
+      <li><span><strong>Claude Code implements</strong> — writes across all files in one session: API route, service, component, types, page integration.</span></li>
+      <li><span><strong>Review against design</strong> — check auth pattern, shared constants placement, import comments per CLAUDE.md, component structure.</span></li>
+    </ol>
+
+    <p>What Claude Code does well here: it reads existing files before writing new ones, recognises established patterns, and applies them consistently without being told. <strong>CLAUDE.md</strong> acts as a permanent rulebook — read at the start of every session, so architectural rules are enforced automatically without re-explaining them each time.</p>
+
+    <h3>Key Features</h3>
+
+    <div class="feature-card">
+      <div class="feature-card-title"><div class="feature-dot"></div>Clerk + DB Sync</div>
+      <p>Clerk handles authentication out of the box. But the platform needs a DB user row to store per-user media. This is solved via a Clerk webhook — when a user signs up, Clerk fires a <code>user.created</code> event to <code>/api/webhooks/clerk</code>, which creates the corresponding DB record. All subsequent API routes look up the DB user by <code>clerkId</code>. The onboarding gate in middleware checks <code>publicMetadata.onboardingComplete</code> so no DB call is needed at the Edge.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-card-title"><div class="feature-dot"></div>Background Removal</div>
+      <p>Cloudinary has a built-in AI transformation: <code>e_background_removal</code>. Instead of calling an external ML API, the image's Cloudinary public ID is passed to a transformation URL. Cloudinary processes it server-side and returns a PNG with the background removed. No model hosting, no extra cost per call beyond the Cloudinary plan.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-card-title"><div class="feature-dot"></div>Smart Crop for Social Formats</div>
+      <p>Cropping is done via Cloudinary's URL-based transformation API — <code>c_fill</code>, <code>w_{width}</code>, <code>h_{height}</code>, <code>g_auto</code> (AI-powered gravity that detects the subject and centers it). The user picks a social format preset (Instagram 1:1, Twitter 16:9, Facebook Cover, etc.), and the transformed URL is generated instantly. No server processing — just a URL parameter change, and Cloudinary handles the rest on delivery.</p>
+    </div>
+  </div>
+
+  <!-- ── Section 5 ── -->
+  <div class="section">
+    <div class="section-label">
+      <div class="section-number">5</div>
+      <div class="section-title">Why This Matters</div>
+    </div>
+
+    <div class="matters-grid">
+      <div class="matters-card">
+        <div class="matters-icon">🔁</div>
+        <div>
+          <div class="matters-title">The Meta-Layer Is the Story</div>
+          <p class="matters-body">The platform processes media with AI, and it was built with an AI agent. This demonstrates that agentic workflows are not hype — they are a practical, repeatable development methodology that a solo developer can apply to ship real products.</p>
+        </div>
+      </div>
+      <div class="matters-card">
+        <div class="matters-icon">📋</div>
+        <div>
+          <div class="matters-title">CLAUDE.md as a Team Rulebook</div>
+          <p class="matters-body">A living specification file was maintained that Claude Code reads before every session. This is equivalent to onboarding a new developer with a style guide — except the agent follows it perfectly every time. Constants go in lib/constants/. Shared singletons go in lib/. Imports have comments explaining why they're shared. This discipline enforced by a file, not by repetition, is what keeps a solo-built codebase clean at scale.</p>
+        </div>
+      </div>
+      <div class="matters-card">
+        <div class="matters-icon">🧠</div>
+        <div>
+          <div class="matters-title">Memory Across Sessions</div>
+          <p class="matters-body">Claude Code maintained project memory across multiple conversations — architecture, DB schema, coding patterns, known issues. There was no need to re-explain the stack at the start of each session. This is how agentic tools enable a solo developer to maintain the mental overhead of a much larger codebase.</p>
+        </div>
+      </div>
+      <div class="matters-card">
+        <div class="matters-icon">⚡</div>
+        <div>
+          <div class="matters-title">Speed with Correct Architecture</div>
+          <p class="matters-body">Features that would take a solo developer days — bg-remove with API route, service layer, component, types, and playground integration — were shipped in hours, with the right structure from the start. Not prototype-quality code patched together. Production-ready, consistently patterned code that fits the existing architecture.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

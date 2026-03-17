@@ -40,7 +40,8 @@
       "Bash(cd /c/Users/Asus/Desktop/\"WEB DEV PROJECTS\"/vyum-resizer)",
       "Bash(ls \"/c/Users/Asus/Desktop/WEB DEV PROJECTS/vyum-resizer/app/\\(app\\)/playground/\")",
       "Bash(ls -la \"c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\api\\\\images\"\" 2>&1 || echo \"Folder does not exist \")",
-      "Bash(node -e \"require\\(''puppeteer''\\)\")"
+      "Bash(node -e \"require\\(''puppeteer''\\)\")",
+      "Bash(npm run:*)"
     ]
   }
 }
