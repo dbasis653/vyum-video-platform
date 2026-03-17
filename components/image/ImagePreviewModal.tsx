@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Download, Settings, Scissors, LayoutDashboard } from "lucide-react";
+import {
+  Download,
+  Settings,
+  Scissors,
+  LayoutDashboard,
+  Wand2,
+} from "lucide-react";
 import { ImageItem } from "@/types";
 import Button from "@/components/ui/Button";
 import Spinner from "@/components/ui/Spinner";
@@ -11,9 +17,9 @@ interface ImagePreviewModalProps {
   onEdit: () => void;
   onDownload: () => void;
   onCrop: () => void;
+  onBgRemove: () => void;
   onPlayground: () => void;
 }
-
 
 export default function ImagePreviewModal({
   dialogRef,
@@ -22,6 +28,7 @@ export default function ImagePreviewModal({
   onEdit,
   onDownload,
   onCrop,
+  onBgRemove,
   onPlayground,
 }: ImagePreviewModalProps) {
   const [isNavigating, setIsNavigating] = useState(false);
@@ -35,16 +42,19 @@ export default function ImagePreviewModal({
           border: "1px solid rgba(34,211,238,0.15)",
         }}
       >
+        {/* ── Image display ── */}
         <img
           src={imageUrl}
           alt={image.title}
           className="w-auto mx-auto block rounded-xl object-contain max-h-[60vh] max-w-full"
         />
+
         <div className="flex justify-between items-center mt-4">
           <h3 className="font-bold text-sm" style={{ color: "#bfdbfe" }}>
             {image.title}
           </h3>
           <div className="flex gap-2">
+            {/* ── Settings ── */}
             <Button
               variant="ghost"
               size="xs"
@@ -57,6 +67,7 @@ export default function ImagePreviewModal({
               Settings
             </Button>
 
+            {/* ── Crop — navigates to Playground with Crop tool active ── */}
             <Button
               variant="ghost"
               size="xs"
@@ -71,6 +82,22 @@ export default function ImagePreviewModal({
               Crop
             </Button>
 
+            {/* ── BG Remove — navigates to Playground with BG Remove tool active ── */}
+            <Button
+              variant="ghost"
+              size="xs"
+              disabled={isNavigating}
+              onClick={() => {
+                setIsNavigating(true);
+                dialogRef.current?.close();
+                onBgRemove();
+              }}
+            >
+              {isNavigating ? <Spinner /> : <Wand2 size={12} />}
+              BG Remove
+            </Button>
+
+            {/* ── Playground ── */}
             <Button
               variant="ghost"
               size="xs"
@@ -85,6 +112,7 @@ export default function ImagePreviewModal({
               Playground
             </Button>
 
+            {/* ── Download ── */}
             <Button variant="cyan" size="xs" onClick={onDownload}>
               <Download size={12} />
               Download

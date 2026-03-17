@@ -38,6 +38,12 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
     router.push(`/playground/${image.id}`);
   };
 
+  // Navigates to the Playground with the BG Remove tool pre-selected via query param
+  const navigateToPlaygroundBgRemove = () => {
+    setIsNavigating(true);
+    router.push(`/playground/${image.id}?tool=bg-remove`);
+  };
+
   const thumbnailUrl = getCldImageUrl({
     src: image.publicId,
     width: 200,
@@ -208,6 +214,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ image, onUpdate, onDelete }) => {
         onEdit={openModal}
         onDownload={handleDownload}
         onCrop={navigateToPlayground}
+        onBgRemove={navigateToPlaygroundBgRemove}
         onPlayground={navigateToPlayground}
       />
 

@@ -35,7 +35,13 @@
       "Bash(npm install react-image-crop)",
       "WebSearch",
       "Bash(ls -la \"c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\\\(app\\)\\\\crop\\\\\")",
-      "Bash(find \"c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\\\(app\\)\\\\crop\" -type f)"
+      "Bash(find \"c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\\\(app\\)\\\\crop\" -type f)",
+      "Read(//c/Users/Asus/Desktop/WEB/ DEV/ PROJECTS/vyum-resizer/app/**)",
+      "Bash(cd /c/Users/Asus/Desktop/\"WEB DEV PROJECTS\"/vyum-resizer)",
+      "Bash(ls \"/c/Users/Asus/Desktop/WEB DEV PROJECTS/vyum-resizer/app/\\(app\\)/playground/\")",
+      "Bash(ls -la \"c:\\\\Users\\\\Asus\\\\Desktop\\\\WEB DEV PROJECTS\\\\vyum-resizer\\\\app\\\\api\\\\images\"\" 2>&1 || echo \"Folder does not exist \")",
+      "Bash(node -e \"require\\(''puppeteer''\\)\")",
+      "Bash(npm run:*)"
     ]
   }
 }
